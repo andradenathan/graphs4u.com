@@ -12,8 +12,8 @@ export const I18nContext = createContext<I18nContextValue | null>(null);
 function getInitialLang(): LanguageCode {
     const stored = localStorage.getItem("graphs4u-lang");
     if (stored === "pt" || stored === "en") return stored;
-    const browser = navigator.language.slice(0, 2);
-    if (browser === "pt") return "pt";
+    const browserLanguage = navigator.language.slice(0, 2);
+    if (browserLanguage === "pt") return "pt";
     return "en";
 }
 

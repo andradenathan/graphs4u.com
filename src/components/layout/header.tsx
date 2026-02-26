@@ -11,23 +11,25 @@ export function Header() {
     const nodeCount = state.graph.nodes.length;
     const edgeCount = state.graph.edges.length;
 
-    const [langOpen, setLangOpen] = useState(false);
-    const langRef = useRef<HTMLDivElement>(null);
+    const [languageDropdownOpen, setLanguageDropdownOpen] = useState(false);
+    const languageDropdownRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        function handleClick(e: MouseEvent) {
+        function handleClick(event: MouseEvent) {
             if (
-                langRef.current &&
-                !langRef.current.contains(e.target as Node)
+                languageDropdownRef.current &&
+                !languageDropdownRef.current.contains(event.target as Node)
             ) {
-                setLangOpen(false);
+                setLanguageDropdownOpen(false);
             }
         }
         document.addEventListener("mousedown", handleClick);
         return () => document.removeEventListener("mousedown", handleClick);
     }, []);
 
-    const currentLang = languages.find((l) => l.code === lang)!;
+    const currentLanguage = languages.find(
+        (language) => language.code === lang,
+    )!;
 
     return (
         <header
@@ -71,34 +73,35 @@ export function Header() {
 
                 <div className="h-4 w-px bg-border mx-1" />
 
-                {/* Language switcher — text only */}
-                <div ref={langRef} className="relative">
+                <div ref={languageDropdownRef} className="relative">
                     <button
                         type="button"
-                        onClick={() => setLangOpen(!langOpen)}
+                        onClick={() =>
+                            setLanguageDropdownOpen(!languageDropdownOpen)
+                        }
                         className="inline-flex cursor-pointer items-center gap-1 rounded-lg px-2 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-surface-raised hover:text-foreground"
                     >
-                        <span>{currentLang.label}</span>
+                        <span>{currentLanguage.label}</span>
                         <ChevronDown className="size-3 opacity-60" />
                     </button>
 
-                    {langOpen && (
+                    {languageDropdownOpen && (
                         <div className="absolute right-0 top-full z-50 mt-1 min-w-32 overflow-hidden rounded-lg border border-border bg-surface-overlay shadow-xl">
-                            {languages.map((l) => (
+                            {languages.map((language) => (
                                 <button
-                                    key={l.code}
+                                    key={language.code}
                                     type="button"
                                     onClick={() => {
-                                        setLang(l.code as LanguageCode);
-                                        setLangOpen(false);
+                                        setLang(language.code as LanguageCode);
+                                        setLanguageDropdownOpen(false);
                                     }}
                                     className={`flex w-full cursor-pointer items-center px-3 py-2 text-xs transition-colors ${
-                                        lang === l.code
+                                        lang === language.code
                                             ? "bg-primary/10 text-foreground"
                                             : "text-muted-foreground hover:bg-surface-raised hover:text-foreground"
                                     }`}
                                 >
-                                    {l.label}
+                                    {language.label}
                                 </button>
                             ))}
                         </div>

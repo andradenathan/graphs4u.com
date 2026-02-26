@@ -12,7 +12,6 @@ export function GraphSettings() {
 
     return (
         <div className="flex flex-col gap-7" data-slot="graph-settings">
-            {/* Graph Type */}
             <div className="flex flex-col gap-3">
                 <h4 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                     {t("settings.graphType")}
@@ -43,7 +42,6 @@ export function GraphSettings() {
                 </div>
             </div>
 
-            {/* Export */}
             <div className="flex flex-col gap-3">
                 <h4 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                     {t("settings.export")}
@@ -71,7 +69,6 @@ export function GraphSettings() {
                 </div>
             </div>
 
-            {/* Keyboard Shortcuts */}
             <div className="flex flex-col gap-2">
                 <h4 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                     {t("settings.shortcuts")}

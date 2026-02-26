@@ -49,7 +49,6 @@ export function BoardToolbar() {
                             <Icon />
                         </IconButton>
 
-                        {/* Tooltip */}
                         <div className="pointer-events-none absolute left-full top-1/2 ml-2 -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-100">
                             <div className="flex items-center gap-2 whitespace-nowrap rounded-lg border border-border bg-surface-overlay px-2.5 py-1.5 text-xs shadow-lg">
                                 <span className="text-foreground">{label}</span>

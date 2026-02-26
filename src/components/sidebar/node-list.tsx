@@ -53,10 +53,12 @@ export function NodeList() {
 
                         <Input
                             value={node.label}
-                            onChange={(e) =>
-                                updateNode(node.id, { label: e.target.value })
+                            onChange={(event) =>
+                                updateNode(node.id, {
+                                    label: event.target.value,
+                                })
                             }
-                            onClick={(e) => e.stopPropagation()}
+                            onClick={(event) => event.stopPropagation()}
                             className="h-6 border-transparent bg-transparent px-1 text-xs focus:border-border focus:bg-surface"
                         />
 
@@ -69,8 +71,8 @@ export function NodeList() {
                             aria-label={`Delete node ${node.label}`}
                             variant="destructive"
                             size="sm"
-                            onClick={(e) => {
-                                e.stopPropagation();
+                            onClick={(event) => {
+                                event.stopPropagation();
                                 deleteNode(node.id);
                             }}
                             className="size-6 opacity-0 group-hover:opacity-100 transition-opacity"

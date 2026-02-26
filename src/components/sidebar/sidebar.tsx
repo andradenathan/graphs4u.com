@@ -51,7 +51,6 @@ export function Sidebar() {
                 collapsed ? "w-12" : "w-72",
             )}
         >
-            {/* Sidebar header */}
             <div className="flex h-10 items-center justify-between border-b border-border px-2">
                 {!collapsed && (
                     <span className="px-1 text-xs font-medium uppercase tracking-wider text-muted-foreground">
@@ -69,7 +68,6 @@ export function Sidebar() {
                 </IconButton>
             </div>
 
-            {/* Tabs */}
             {!collapsed && (
                 <>
                     <nav className="flex gap-1 border-b border-border px-2">
@@ -99,7 +97,6 @@ export function Sidebar() {
                         })}
                     </nav>
 
-                    {/* Content */}
                     <div
                         className={twMerge(
                             "flex-1 overflow-y-auto p-3",
@@ -113,7 +110,6 @@ export function Sidebar() {
                 </>
             )}
 
-            {/* Collapsed icons */}
             {collapsed && (
                 <div className="flex flex-col items-center gap-1 pt-2">
                     {tabs.map((tab) => {

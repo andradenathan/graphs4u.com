@@ -8,10 +8,11 @@ export function exportGraphAsPdf(graph: Graph) {
 
     if (nodes.length === 0) return;
 
-    let minX = Infinity,
-        minY = Infinity,
-        maxX = -Infinity,
-        maxY = -Infinity;
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+
     for (const node of nodes) {
         if (node.x - NODE_RADIUS < minX) minX = node.x - NODE_RADIUS;
         if (node.y - NODE_RADIUS < minY) minY = node.y - NODE_RADIUS;
@@ -28,58 +29,58 @@ export function exportGraphAsPdf(graph: Graph) {
     svg += `<rect width="${width}" height="${height}" fill="#1a1a1f"/>`;
 
     if (directed) {
-        svg += `<defs><marker id="ah" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">`;
+        svg += `<defs><marker id="arrowhead" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">`;
         svg += `<polygon points="0 0, 10 5, 0 10" fill="#666"/>`;
         svg += `</marker></defs>`;
     }
 
     for (const edge of edges) {
-        const src = nodes.find((n) => n.id === edge.source);
-        const tgt = nodes.find((n) => n.id === edge.target);
-        if (!src || !tgt) continue;
+        const sourceNode = nodes.find((node) => node.id === edge.source);
+        const targetNode = nodes.find((node) => node.id === edge.target);
+        if (!sourceNode || !targetNode) continue;
 
-        const dx = tgt.x - src.x;
-        const dy = tgt.y - src.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist === 0) continue;
+        const deltaX = targetNode.x - sourceNode.x;
+        const deltaY = targetNode.y - sourceNode.y;
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        if (distance === 0) continue;
 
-        const ux = dx / dist;
-        const uy = dy / dist;
-        const sx = src.x + ux * NODE_RADIUS + offsetX;
-        const sy = src.y + uy * NODE_RADIUS + offsetY;
-        const tx = tgt.x - ux * NODE_RADIUS + offsetX;
-        const ty = tgt.y - uy * NODE_RADIUS + offsetY;
+        const unitX = deltaX / distance;
+        const unitY = deltaY / distance;
+        const startX = sourceNode.x + unitX * NODE_RADIUS + offsetX;
+        const startY = sourceNode.y + unitY * NODE_RADIUS + offsetY;
+        const endX = targetNode.x - unitX * NODE_RADIUS + offsetX;
+        const endY = targetNode.y - unitY * NODE_RADIUS + offsetY;
 
-        svg += `<line x1="${sx}" y1="${sy}" x2="${tx}" y2="${ty}" stroke="#666" stroke-width="1.5"`;
-        if (directed) svg += ` marker-end="url(#ah)"`;
+        svg += `<line x1="${startX}" y1="${startY}" x2="${endX}" y2="${endY}" stroke="#666" stroke-width="1.5"`;
+        if (directed) svg += ` marker-end="url(#arrowhead)"`;
         svg += `/>`;
 
         if (weighted) {
-            const mx = (src.x + tgt.x) / 2 + offsetX;
-            const my = (src.y + tgt.y) / 2 + offsetY - 8;
-            svg += `<text x="${mx}" y="${my}" text-anchor="middle" fill="#999" font-size="11" font-family="Inter, sans-serif">${edge.weight}</text>`;
+            const midpointX = (sourceNode.x + targetNode.x) / 2 + offsetX;
+            const midpointY = (sourceNode.y + targetNode.y) / 2 + offsetY - 8;
+            svg += `<text x="${midpointX}" y="${midpointY}" text-anchor="middle" fill="#999" font-size="11" font-family="Inter, sans-serif">${edge.weight}</text>`;
         }
     }
 
     for (const node of nodes) {
-        const cx = node.x + offsetX;
-        const cy = node.y + offsetY;
-        svg += `<circle cx="${cx}" cy="${cy}" r="${NODE_RADIUS}" fill="#2a2a32" stroke="#555" stroke-width="2"/>`;
-        svg += `<text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="central" fill="#eee" font-size="12" font-weight="600" font-family="Inter, sans-serif">${node.label}</text>`;
+        const centerX = node.x + offsetX;
+        const centerY = node.y + offsetY;
+        svg += `<circle cx="${centerX}" cy="${centerY}" r="${NODE_RADIUS}" fill="#2a2a32" stroke="#555" stroke-width="2"/>`;
+        svg += `<text x="${centerX}" y="${centerY}" text-anchor="middle" dominant-baseline="central" fill="#eee" font-size="12" font-weight="600" font-family="Inter, sans-serif">${node.label}</text>`;
     }
 
     svg += `</svg>`;
 
     const blob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
+    const blobUrl = URL.createObjectURL(blob);
 
     const printWindow = window.open("", "_blank");
     if (!printWindow) {
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "graph.svg";
-        a.click();
-        URL.revokeObjectURL(url);
+        const downloadLink = document.createElement("a");
+        downloadLink.href = blobUrl;
+        downloadLink.download = "graph.svg";
+        downloadLink.click();
+        URL.revokeObjectURL(blobUrl);
         return;
     }
 
@@ -98,7 +99,7 @@ export function exportGraphAsPdf(graph: Graph) {
 			</style>
 		</head>
 		<body>
-			<img src="${url}" alt="Graph export" />
+			<img src="${blobUrl}" alt="Graph export" />
 			<script>
 				window.onafterprint = function() { window.close(); };
 				setTimeout(function() { window.print(); }, 300);

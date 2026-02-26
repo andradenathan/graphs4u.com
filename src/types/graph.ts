@@ -21,10 +21,21 @@ export interface Graph {
 
 export type Tool = "select" | "add-node" | "add-edge" | "delete";
 
+export interface AlgorithmResult {
+    algorithmId: string;
+    visitedNodeIds: string[];
+    visitedEdgeIds: string[];
+    resultNodeIds: string[];
+    resultEdgeIds: string[];
+    distances: Record<string, number>;
+    description: string;
+}
+
 export interface GraphState {
     graph: Graph;
     selectedNodeIds: string[];
     selectedEdgeIds: string[];
     activeTool: Tool;
     edgeSourceId: string | null;
+    algorithmResult: AlgorithmResult | null;
 }

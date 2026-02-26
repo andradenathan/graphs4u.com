@@ -8,6 +8,7 @@ import {
 import { useGraph } from "@/hooks/use-graph";
 import { useI18n } from "@/hooks/use-i18n";
 import { BoardToolbar } from "@/components/board/board-toolbar";
+import { AlgorithmFloatingPanel } from "@/components/board/algorithm-floating-panel";
 import { twMerge } from "tailwind-merge";
 
 const NODE_RADIUS = 20;
@@ -44,6 +45,7 @@ export function GraphBoard() {
         selectedNodeIds,
         selectedEdgeIds,
         edgeSourceId,
+        algorithmResult,
     } = state;
 
     const [viewBox, setViewBox] = useState<ViewBox>({
@@ -59,29 +61,29 @@ export function GraphBoard() {
         null,
     );
 
-    // Convert screen coords to SVG coords
     const screenToSvg = useCallback(
         (clientX: number, clientY: number) => {
             const svg = svgRef.current;
             if (!svg) return { x: 0, y: 0 };
-            const rect = svg.getBoundingClientRect();
+            const svgRect = svg.getBoundingClientRect();
             const x =
-                viewBox.x + ((clientX - rect.left) / rect.width) * viewBox.w;
+                viewBox.x +
+                ((clientX - svgRect.left) / svgRect.width) * viewBox.w;
             const y =
-                viewBox.y + ((clientY - rect.top) / rect.height) * viewBox.h;
+                viewBox.y +
+                ((clientY - svgRect.top) / svgRect.height) * viewBox.h;
             return { x, y };
         },
         [viewBox],
     );
 
-    // Keyboard shortcuts
     useEffect(() => {
-        const handler = (e: KeyboardEvent) => {
-            const target = e.target as HTMLElement;
+        const handler = (event: KeyboardEvent) => {
+            const target = event.target as HTMLElement;
             if (target.tagName === "INPUT" || target.tagName === "TEXTAREA")
                 return;
 
-            switch (e.key.toLowerCase()) {
+            switch (event.key.toLowerCase()) {
                 case "v":
                     setTool("select");
                     break;
@@ -96,8 +98,8 @@ export function GraphBoard() {
                     break;
                 case "delete":
                 case "backspace":
-                    selectedNodeIds.forEach((id) => deleteNode(id));
-                    selectedEdgeIds.forEach((id) => deleteEdge(id));
+                    selectedNodeIds.forEach((nodeId) => deleteNode(nodeId));
+                    selectedEdgeIds.forEach((edgeId) => deleteEdge(edgeId));
                     break;
                 case "escape":
                     clearSelection();
@@ -115,39 +117,45 @@ export function GraphBoard() {
         setTool,
     ]);
 
-    // Zoom with mouse wheel
     const handleWheel = useCallback(
-        (e: React.WheelEvent) => {
-            e.preventDefault();
-            const factor = e.deltaY > 0 ? 1.08 : 0.92;
-            const svgPt = screenToSvg(e.clientX, e.clientY);
+        (wheelEvent: React.WheelEvent) => {
+            wheelEvent.preventDefault();
+            const factor = wheelEvent.deltaY > 0 ? 1.08 : 0.92;
+            const svgPoint = screenToSvg(
+                wheelEvent.clientX,
+                wheelEvent.clientY,
+            );
 
-            setViewBox((vb) => {
-                const newW = vb.w * factor;
-                const newH = vb.h * factor;
-                // Clamp zoom
-                if (newW < 200 || newW > 8000) return vb;
-                const newX = svgPt.x - (svgPt.x - vb.x) * factor;
-                const newY = svgPt.y - (svgPt.y - vb.y) * factor;
-                return { x: newX, y: newY, w: newW, h: newH };
+            setViewBox((currentViewBox) => {
+                const newWidth = currentViewBox.w * factor;
+                const newHeight = currentViewBox.h * factor;
+
+                if (newWidth < 200 || newWidth > 8000) return currentViewBox;
+                const newX =
+                    svgPoint.x - (svgPoint.x - currentViewBox.x) * factor;
+                const newY =
+                    svgPoint.y - (svgPoint.y - currentViewBox.y) * factor;
+                return { x: newX, y: newY, w: newWidth, h: newHeight };
             });
         },
         [screenToSvg],
     );
 
-    // Mouse down on SVG background
     const handleBackgroundMouseDown = useCallback(
-        (e: MouseEvent<SVGSVGElement>) => {
+        (mouseEvent: MouseEvent<SVGSVGElement>) => {
             if (
-                e.target !== svgRef.current &&
-                (e.target as SVGElement).tagName !== "rect"
+                mouseEvent.target !== svgRef.current &&
+                (mouseEvent.target as SVGElement).tagName !== "rect"
             )
                 return;
 
-            const svgPt = screenToSvg(e.clientX, e.clientY);
+            const svgPoint = screenToSvg(
+                mouseEvent.clientX,
+                mouseEvent.clientY,
+            );
 
             if (activeTool === "add-node") {
-                addNode(svgPt.x, svgPt.y);
+                addNode(svgPoint.x, svgPoint.y);
                 return;
             }
 
@@ -155,12 +163,14 @@ export function GraphBoard() {
                 clearSelection();
             }
 
-            // Start panning with middle button or space
-            if (e.button === 1 || (e.button === 0 && activeTool === "select")) {
+            if (
+                mouseEvent.button === 1 ||
+                (mouseEvent.button === 0 && activeTool === "select")
+            ) {
                 setIsPanning(true);
                 setPanStart({
-                    x: e.clientX,
-                    y: e.clientY,
+                    x: mouseEvent.clientX,
+                    y: mouseEvent.clientY,
                     vbX: viewBox.x,
                     vbY: viewBox.y,
                 });
@@ -170,28 +180,35 @@ export function GraphBoard() {
     );
 
     const handleMouseMove = useCallback(
-        (e: MouseEvent<SVGSVGElement>) => {
-            const svgPt = screenToSvg(e.clientX, e.clientY);
+        (mouseEvent: MouseEvent<SVGSVGElement>) => {
+            const svgPoint = screenToSvg(
+                mouseEvent.clientX,
+                mouseEvent.clientY,
+            );
 
             if (activeTool === "add-edge" && edgeSourceId) {
-                setMousePos(svgPt);
+                setMousePos(svgPoint);
             }
 
             if (isPanning) {
                 const svg = svgRef.current;
                 if (!svg) return;
-                const rect = svg.getBoundingClientRect();
-                const dx = ((e.clientX - panStart.x) / rect.width) * viewBox.w;
-                const dy = ((e.clientY - panStart.y) / rect.height) * viewBox.h;
-                setViewBox((vb) => ({
-                    ...vb,
-                    x: panStart.vbX - dx,
-                    y: panStart.vbY - dy,
+                const svgRect = svg.getBoundingClientRect();
+                const panDeltaX =
+                    ((mouseEvent.clientX - panStart.x) / svgRect.width) *
+                    viewBox.w;
+                const panDeltaY =
+                    ((mouseEvent.clientY - panStart.y) / svgRect.height) *
+                    viewBox.h;
+                setViewBox((currentViewBox) => ({
+                    ...currentViewBox,
+                    x: panStart.vbX - panDeltaX,
+                    y: panStart.vbY - panDeltaY,
                 }));
             }
 
             if (draggingNode) {
-                moveNode(draggingNode, svgPt.x, svgPt.y);
+                moveNode(draggingNode, svgPoint.x, svgPoint.y);
             }
         },
         [
@@ -211,14 +228,13 @@ export function GraphBoard() {
         setDraggingNode(null);
     }, []);
 
-    // Node interactions
     const handleNodeMouseDown = useCallback(
-        (e: MouseEvent, nodeId: string) => {
-            e.stopPropagation();
+        (mouseEvent: MouseEvent, nodeId: string) => {
+            mouseEvent.stopPropagation();
 
             switch (activeTool) {
                 case "select":
-                    selectNode(nodeId, e.shiftKey);
+                    selectNode(nodeId, mouseEvent.shiftKey);
                     setDraggingNode(nodeId);
                     break;
                 case "add-edge":
@@ -244,14 +260,13 @@ export function GraphBoard() {
         ],
     );
 
-    // Edge interactions
     const handleEdgeMouseDown = useCallback(
-        (e: MouseEvent, edgeId: string) => {
-            e.stopPropagation();
+        (mouseEvent: MouseEvent, edgeId: string) => {
+            mouseEvent.stopPropagation();
 
             switch (activeTool) {
                 case "select":
-                    selectEdge(edgeId, e.shiftKey);
+                    selectEdge(edgeId, mouseEvent.shiftKey);
                     break;
                 case "delete":
                     deleteEdge(edgeId);
@@ -261,50 +276,48 @@ export function GraphBoard() {
         [activeTool, selectEdge, deleteEdge],
     );
 
-    // Compute edge path with offset for directed graphs
     const getEdgePath = useCallback(
         (sourceId: string, targetId: string) => {
-            const source = graph.nodes.find((n) => n.id === sourceId);
-            const target = graph.nodes.find((n) => n.id === targetId);
-            if (!source || !target) return "";
+            const sourceNode = graph.nodes.find((node) => node.id === sourceId);
+            const targetNode = graph.nodes.find((node) => node.id === targetId);
+            if (!sourceNode || !targetNode) return "";
 
-            const dx = target.x - source.x;
-            const dy = target.y - source.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            if (dist === 0) return "";
+            const deltaX = targetNode.x - sourceNode.x;
+            const deltaY = targetNode.y - sourceNode.y;
+            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+            if (distance === 0) return "";
 
-            const ux = dx / dist;
-            const uy = dy / dist;
+            const unitX = deltaX / distance;
+            const unitY = deltaY / distance;
 
-            const sx = source.x + ux * NODE_RADIUS;
-            const sy = source.y + uy * NODE_RADIUS;
-            const tx = target.x - ux * NODE_RADIUS;
-            const ty = target.y - uy * NODE_RADIUS;
+            const startX = sourceNode.x + unitX * NODE_RADIUS;
+            const startY = sourceNode.y + unitY * NODE_RADIUS;
+            const endX = targetNode.x - unitX * NODE_RADIUS;
+            const endY = targetNode.y - unitY * NODE_RADIUS;
 
-            return `M ${sx} ${sy} L ${tx} ${ty}`;
+            return `M ${startX} ${startY} L ${endX} ${endY}`;
         },
         [graph.nodes],
     );
 
-    // Preview edge line (while creating edge)
     const previewLine =
         edgeSourceId && mousePos
             ? (() => {
-                  const source = graph.nodes.find((n) => n.id === edgeSourceId);
-                  if (!source) return null;
+                  const sourceNode = graph.nodes.find(
+                      (node) => node.id === edgeSourceId,
+                  );
+                  if (!sourceNode) return null;
                   return {
-                      x1: source.x,
-                      y1: source.y,
+                      x1: sourceNode.x,
+                      y1: sourceNode.y,
                       x2: mousePos.x,
                       y2: mousePos.y,
                   };
               })()
             : null;
 
-    // Grid pattern
     const gridSize = 40;
 
-    // Cursor
     const cursorClass =
         activeTool === "add-node"
             ? "cursor-crosshair"
@@ -323,8 +336,8 @@ export function GraphBoard() {
             data-slot="graph-board"
         >
             <BoardToolbar />
+            <AlgorithmFloatingPanel />
 
-            {/* Status bar */}
             <div className="absolute bottom-3 left-3 z-10 flex items-center gap-2 rounded-lg border border-border bg-surface/90 px-2.5 py-1 text-[11px] text-muted-foreground backdrop-blur-sm">
                 {activeTool === "add-edge" && edgeSourceId && (
                     <span className="text-primary">
@@ -358,7 +371,6 @@ export function GraphBoard() {
                 )}
             </div>
 
-            {/* Zoom indicator */}
             <div className="absolute bottom-3 right-3 z-10 rounded-lg border border-border bg-surface/90 px-2 py-1 text-[11px] tabular-nums text-muted-foreground backdrop-blur-sm">
                 {Math.round((1000 / viewBox.w) * 100)}%
             </div>
@@ -373,7 +385,6 @@ export function GraphBoard() {
                 onMouseLeave={handleMouseUp}
                 onWheel={handleWheel}
             >
-                {/* Grid pattern */}
                 <defs>
                     <pattern
                         id="grid"
@@ -389,7 +400,6 @@ export function GraphBoard() {
                         />
                     </pattern>
 
-                    {/* Arrowhead marker */}
                     <marker
                         id="arrowhead"
                         markerWidth={ARROWHEAD_SIZE}
@@ -417,9 +427,22 @@ export function GraphBoard() {
                             fill="var(--color-edge-selected)"
                         />
                     </marker>
+
+                    <marker
+                        id="arrowhead-algo"
+                        markerWidth={ARROWHEAD_SIZE}
+                        markerHeight={ARROWHEAD_SIZE}
+                        refX={ARROWHEAD_SIZE - 2}
+                        refY={ARROWHEAD_SIZE / 2}
+                        orient="auto"
+                    >
+                        <polygon
+                            points={`0 0, ${ARROWHEAD_SIZE} ${ARROWHEAD_SIZE / 2}, 0 ${ARROWHEAD_SIZE}`}
+                            fill="var(--color-algo-result)"
+                        />
+                    </marker>
                 </defs>
 
-                {/* Grid background */}
                 <rect
                     x={viewBox.x - viewBox.w}
                     y={viewBox.y - viewBox.h}
@@ -428,70 +451,76 @@ export function GraphBoard() {
                     fill="url(#grid)"
                 />
 
-                {/* Edges */}
                 {graph.edges.map((edge) => {
                     const isSelected = selectedEdgeIds.includes(edge.id);
+                    const isAlgoResult =
+                        algorithmResult?.resultEdgeIds.includes(edge.id) ??
+                        false;
+                    const isAlgoDimmed = algorithmResult && !isAlgoResult;
                     const path = getEdgePath(edge.source, edge.target);
                     if (!path) return null;
 
-                    const source = graph.nodes.find(
-                        (n) => n.id === edge.source,
+                    const sourceNode = graph.nodes.find(
+                        (node) => node.id === edge.source,
                     );
-                    const target = graph.nodes.find(
-                        (n) => n.id === edge.target,
+                    const targetNode = graph.nodes.find(
+                        (node) => node.id === edge.target,
                     );
-                    if (!source || !target) return null;
+                    if (!sourceNode || !targetNode) return null;
 
-                    const midX = (source.x + target.x) / 2;
-                    const midY = (source.y + target.y) / 2;
+                    const midX = (sourceNode.x + targetNode.x) / 2;
+                    const midY = (sourceNode.y + targetNode.y) / 2;
+
+                    const edgeColor = isSelected
+                        ? "var(--color-edge-selected)"
+                        : isAlgoResult
+                          ? "var(--color-algo-result)"
+                          : isAlgoDimmed
+                            ? "var(--color-algo-result-dim)"
+                            : "var(--color-edge)";
 
                     return (
                         <g key={edge.id}>
-                            {/* Hit area (wider invisible path for easier clicking) */}
                             <path
                                 d={path}
                                 stroke="transparent"
                                 strokeWidth="12"
                                 fill="none"
                                 className="cursor-pointer"
-                                onMouseDown={(e) =>
+                                onMouseDown={(event) =>
                                     handleEdgeMouseDown(
-                                        e as unknown as MouseEvent,
+                                        event as unknown as MouseEvent,
                                         edge.id,
                                     )
                                 }
                             />
-                            {/* Visible edge */}
+
                             <path
                                 d={path}
-                                stroke={
-                                    isSelected
-                                        ? "var(--color-edge-selected)"
-                                        : "var(--color-edge)"
+                                stroke={edgeColor}
+                                strokeWidth={
+                                    isSelected ? 2.5 : isAlgoResult ? 2.5 : 1.5
                                 }
-                                strokeWidth={isSelected ? 2.5 : 1.5}
                                 fill="none"
                                 markerEnd={
                                     graph.directed
                                         ? isSelected
                                             ? "url(#arrowhead-selected)"
-                                            : "url(#arrowhead)"
+                                            : isAlgoResult
+                                              ? "url(#arrowhead-algo)"
+                                              : "url(#arrowhead)"
                                         : undefined
                                 }
                                 className="pointer-events-none transition-colors"
                             />
-                            {/* Weight label */}
+
                             {graph.weighted && (
                                 <text
                                     x={midX}
                                     y={midY - 8}
                                     textAnchor="middle"
                                     className="pointer-events-none select-none text-[11px] tabular-nums"
-                                    fill={
-                                        isSelected
-                                            ? "var(--color-edge-selected)"
-                                            : "var(--color-foreground-subtle)"
-                                    }
+                                    fill={edgeColor}
                                 >
                                     {edge.weight}
                                 </text>
@@ -500,7 +529,6 @@ export function GraphBoard() {
                     );
                 })}
 
-                {/* Preview edge line */}
                 {previewLine && (
                     <line
                         x1={previewLine.x1}
@@ -515,23 +543,46 @@ export function GraphBoard() {
                     />
                 )}
 
-                {/* Nodes */}
                 {graph.nodes.map((node) => {
                     const isSelected = selectedNodeIds.includes(node.id);
                     const isEdgeSource = edgeSourceId === node.id;
+                    const isAlgoResult =
+                        algorithmResult?.resultNodeIds.includes(node.id) ??
+                        false;
+                    const isAlgoDimmed = algorithmResult && !isAlgoResult;
+
+                    const nodeFill =
+                        isSelected || isEdgeSource
+                            ? "var(--color-node)"
+                            : isAlgoResult
+                              ? "var(--color-algo-result)"
+                              : isAlgoDimmed
+                                ? "var(--color-surface-raised)"
+                                : "var(--color-surface-raised)";
+
+                    const nodeStroke =
+                        isSelected || isEdgeSource
+                            ? "var(--color-node)"
+                            : isAlgoResult
+                              ? "var(--color-algo-result)"
+                              : isAlgoDimmed
+                                ? "var(--color-algo-result-dim)"
+                                : "var(--color-border-hover)";
+
+                    const nodeOpacity = isAlgoDimmed ? 0.4 : 1;
 
                     return (
                         <g
                             key={node.id}
-                            onMouseDown={(e) =>
+                            onMouseDown={(event) =>
                                 handleNodeMouseDown(
-                                    e as unknown as MouseEvent,
+                                    event as unknown as MouseEvent,
                                     node.id,
                                 )
                             }
                             className="cursor-pointer"
+                            opacity={nodeOpacity}
                         >
-                            {/* Selection / hover ring */}
                             <circle
                                 cx={node.x}
                                 cy={node.y}
@@ -540,33 +591,25 @@ export function GraphBoard() {
                                 stroke={
                                     isSelected || isEdgeSource
                                         ? "var(--color-node-selected)"
-                                        : "transparent"
+                                        : isAlgoResult
+                                          ? "var(--color-algo-result)"
+                                          : "transparent"
                                 }
                                 strokeWidth="2"
                                 opacity={0.5}
                                 className="transition-all"
                             />
 
-                            {/* Node circle */}
                             <circle
                                 cx={node.x}
                                 cy={node.y}
                                 r={NODE_RADIUS}
-                                fill={
-                                    isSelected || isEdgeSource
-                                        ? "var(--color-node)"
-                                        : "var(--color-surface-raised)"
-                                }
-                                stroke={
-                                    isSelected || isEdgeSource
-                                        ? "var(--color-node)"
-                                        : "var(--color-border-hover)"
-                                }
+                                fill={nodeFill}
+                                stroke={nodeStroke}
                                 strokeWidth="2"
                                 className="transition-colors"
                             />
 
-                            {/* Hover highlight */}
                             <circle
                                 cx={node.x}
                                 cy={node.y}
@@ -575,7 +618,6 @@ export function GraphBoard() {
                                 className="hover:fill-[var(--color-node-hover)] hover:opacity-20"
                             />
 
-                            {/* Label */}
                             <text
                                 x={node.x}
                                 y={node.y}
@@ -584,7 +626,9 @@ export function GraphBoard() {
                                 fill={
                                     isSelected || isEdgeSource
                                         ? "var(--color-primary-foreground)"
-                                        : "var(--color-foreground)"
+                                        : isAlgoResult
+                                          ? "var(--color-primary-foreground)"
+                                          : "var(--color-foreground)"
                                 }
                                 className="pointer-events-none select-none text-xs font-semibold"
                             >

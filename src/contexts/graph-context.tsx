@@ -1,5 +1,11 @@
 import { createContext, useReducer, useCallback, type ReactNode } from "react";
-import type { GraphNode, GraphEdge, GraphState, Tool } from "@/types/graph";
+import type {
+    GraphNode,
+    GraphEdge,
+    GraphState,
+    Tool,
+    AlgorithmResult,
+} from "@/types/graph";
 import { graphReducer, initialState } from "@/stores/graph-store";
 
 export interface GraphContextValue {
@@ -19,6 +25,8 @@ export interface GraphContextValue {
     clearGraph: () => void;
     setDirected: (directed: boolean) => void;
     setWeighted: (weighted: boolean) => void;
+    setAlgorithmResult: (result: AlgorithmResult) => void;
+    clearAlgorithmResult: () => void;
 }
 
 export const GraphContext = createContext<GraphContextValue | null>(null);
@@ -92,6 +100,14 @@ export function GraphProvider({ children }: { children: ReactNode }) {
         dispatch({ type: "SET_WEIGHTED", payload: { weighted } });
     }, []);
 
+    const setAlgorithmResult = useCallback((result: AlgorithmResult) => {
+        dispatch({ type: "SET_ALGORITHM_RESULT", payload: { result } });
+    }, []);
+
+    const clearAlgorithmResult = useCallback(() => {
+        dispatch({ type: "CLEAR_ALGORITHM_RESULT" });
+    }, []);
+
     return (
         <GraphContext
             value={{
@@ -111,6 +127,8 @@ export function GraphProvider({ children }: { children: ReactNode }) {
                 clearGraph,
                 setDirected,
                 setWeighted,
+                setAlgorithmResult,
+                clearAlgorithmResult,
             }}
         >
             {children}

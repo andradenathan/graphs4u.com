@@ -61,7 +61,7 @@ export function EdgeList() {
                         {weighted && (
                             <div
                                 className="ml-auto flex items-center gap-0.5 rounded-md border border-border bg-surface"
-                                onClick={(e) => e.stopPropagation()}
+                                onClick={(event) => event.stopPropagation()}
                             >
                                 <button
                                     type="button"
@@ -77,9 +77,10 @@ export function EdgeList() {
                                 <input
                                     type="number"
                                     value={edge.weight}
-                                    onChange={(e) =>
+                                    onChange={(event) =>
                                         updateEdge(edge.id, {
-                                            weight: Number(e.target.value) || 0,
+                                            weight:
+                                                Number(event.target.value) || 0,
                                         })
                                     }
                                     className="h-5 w-8 border-x border-border bg-transparent text-center text-xs tabular-nums text-foreground outline-none"
@@ -102,8 +103,8 @@ export function EdgeList() {
                             aria-label="Delete edge"
                             variant="destructive"
                             size="sm"
-                            onClick={(e) => {
-                                e.stopPropagation();
+                            onClick={(event) => {
+                                event.stopPropagation();
                                 deleteEdge(edge.id);
                             }}
                             className="ml-auto size-6 opacity-0 group-hover:opacity-100 transition-opacity"

@@ -6,9 +6,6 @@ interface FlagProps extends ComponentProps<"svg"> {
     size?: number;
 }
 
-/**
- * All flags use a uniform 3:2 aspect ratio for visual consistency.
- */
 export function Flag({ code, size = 20, className, ...props }: FlagProps) {
     const w = size;
     const h = size * 0.667;
@@ -25,18 +22,14 @@ export function Flag({ code, size = 20, className, ...props }: FlagProps) {
                 className={shared}
                 {...props}
             >
-                {/* Red background */}
                 <rect width="190" height="100" fill="#B22234" />
-                {/* White stripes (6 of 13) */}
                 <rect y="7.69" width="190" height="7.69" fill="#fff" />
                 <rect y="23.08" width="190" height="7.69" fill="#fff" />
                 <rect y="38.46" width="190" height="7.69" fill="#fff" />
                 <rect y="53.85" width="190" height="7.69" fill="#fff" />
                 <rect y="69.23" width="190" height="7.69" fill="#fff" />
                 <rect y="84.62" width="190" height="7.69" fill="#fff" />
-                {/* Blue canton */}
                 <rect width="76" height="53.85" fill="#3C3B6E" />
-                {/* Stars — simplified 5 rows */}
                 {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
                     <circle
                         key={`r1-${i}`}

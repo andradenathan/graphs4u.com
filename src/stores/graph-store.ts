@@ -1,12 +1,25 @@
 import { generateId } from "@/lib/utils";
-import type { Graph, GraphNode, GraphEdge, GraphState, Tool } from "@/types/graph";
+import type {
+    Graph,
+    GraphNode,
+    GraphEdge,
+    GraphState,
+    Tool,
+    AlgorithmResult,
+} from "@/types/graph";
 
 export type Action =
     | { type: "ADD_NODE"; payload: { x: number; y: number } }
-    | { type: "UPDATE_NODE"; payload: { id: string; updates: Partial<Omit<GraphNode, "id">> } }
+    | {
+          type: "UPDATE_NODE";
+          payload: { id: string; updates: Partial<Omit<GraphNode, "id">> };
+      }
     | { type: "DELETE_NODE"; payload: { id: string } }
     | { type: "ADD_EDGE"; payload: { source: string; target: string } }
-    | { type: "UPDATE_EDGE"; payload: { id: string; updates: Partial<Omit<GraphEdge, "id">> } }
+    | {
+          type: "UPDATE_EDGE";
+          payload: { id: string; updates: Partial<Omit<GraphEdge, "id">> };
+      }
     | { type: "DELETE_EDGE"; payload: { id: string } }
     | { type: "SELECT_NODE"; payload: { id: string; multi?: boolean } }
     | { type: "SELECT_EDGE"; payload: { id: string; multi?: boolean } }
@@ -16,7 +29,9 @@ export type Action =
     | { type: "SET_DIRECTED"; payload: { directed: boolean } }
     | { type: "SET_WEIGHTED"; payload: { weighted: boolean } }
     | { type: "CLEAR_GRAPH" }
-    | { type: "MOVE_NODE"; payload: { id: string; x: number; y: number } };
+    | { type: "MOVE_NODE"; payload: { id: string; x: number; y: number } }
+    | { type: "SET_ALGORITHM_RESULT"; payload: { result: AlgorithmResult } }
+    | { type: "CLEAR_ALGORITHM_RESULT" };
 
 const initialGraph: Graph = {
     nodes: [],
@@ -31,13 +46,15 @@ export const initialState: GraphState = {
     selectedEdgeIds: [],
     activeTool: "select",
     edgeSourceId: null,
+    algorithmResult: null,
 };
 
 let nodeCounter = 0;
 
 function getNextLabel(): string {
     const label = String.fromCharCode(65 + (nodeCounter % 26));
-    const suffix = nodeCounter >= 26 ? Math.floor(nodeCounter / 26).toString() : "";
+    const suffix =
+        nodeCounter >= 26 ? Math.floor(nodeCounter / 26).toString() : "";
     nodeCounter++;
     return label + suffix;
 }
@@ -59,6 +76,7 @@ export function graphReducer(state: GraphState, action: Action): GraphState {
                 },
                 selectedNodeIds: [newNode.id],
                 selectedEdgeIds: [],
+                algorithmResult: null,
             };
         }
 
@@ -67,10 +85,10 @@ export function graphReducer(state: GraphState, action: Action): GraphState {
                 ...state,
                 graph: {
                     ...state.graph,
-                    nodes: state.graph.nodes.map((n) =>
-                        n.id === action.payload.id
-                            ? { ...n, ...action.payload.updates }
-                            : n,
+                    nodes: state.graph.nodes.map((node) =>
+                        node.id === action.payload.id
+                            ? { ...node, ...action.payload.updates }
+                            : node,
                     ),
                 },
             };
@@ -82,22 +100,31 @@ export function graphReducer(state: GraphState, action: Action): GraphState {
                 ...state,
                 graph: {
                     ...state.graph,
-                    nodes: state.graph.nodes.filter((n) => n.id !== nodeId),
+                    nodes: state.graph.nodes.filter(
+                        (node) => node.id !== nodeId,
+                    ),
                     edges: state.graph.edges.filter(
-                        (e) => e.source !== nodeId && e.target !== nodeId,
+                        (edge) =>
+                            edge.source !== nodeId && edge.target !== nodeId,
                     ),
                 },
-                selectedNodeIds: state.selectedNodeIds.filter((id) => id !== nodeId),
-                edgeSourceId: state.edgeSourceId === nodeId ? null : state.edgeSourceId,
+                selectedNodeIds: state.selectedNodeIds.filter(
+                    (id) => id !== nodeId,
+                ),
+                edgeSourceId:
+                    state.edgeSourceId === nodeId ? null : state.edgeSourceId,
+                algorithmResult: null,
             };
         }
 
         case "ADD_EDGE": {
             const { source, target } = action.payload;
             const exists = state.graph.edges.some(
-                (e) =>
-                    (e.source === source && e.target === target) ||
-                    (!state.graph.directed && e.source === target && e.target === source),
+                (edge) =>
+                    (edge.source === source && edge.target === target) ||
+                    (!state.graph.directed &&
+                        edge.source === target &&
+                        edge.target === source),
             );
             if (exists || source === target) return state;
 
@@ -116,6 +143,7 @@ export function graphReducer(state: GraphState, action: Action): GraphState {
                 selectedEdgeIds: [newEdge.id],
                 selectedNodeIds: [],
                 edgeSourceId: null,
+                algorithmResult: null,
             };
         }
 
@@ -124,10 +152,10 @@ export function graphReducer(state: GraphState, action: Action): GraphState {
                 ...state,
                 graph: {
                     ...state.graph,
-                    edges: state.graph.edges.map((e) =>
-                        e.id === action.payload.id
-                            ? { ...e, ...action.payload.updates }
-                            : e,
+                    edges: state.graph.edges.map((edge) =>
+                        edge.id === action.payload.id
+                            ? { ...edge, ...action.payload.updates }
+                            : edge,
                     ),
                 },
             };
@@ -138,9 +166,14 @@ export function graphReducer(state: GraphState, action: Action): GraphState {
                 ...state,
                 graph: {
                     ...state.graph,
-                    edges: state.graph.edges.filter((e) => e.id !== action.payload.id),
+                    edges: state.graph.edges.filter(
+                        (edge) => edge.id !== action.payload.id,
+                    ),
                 },
-                selectedEdgeIds: state.selectedEdgeIds.filter((id) => id !== action.payload.id),
+                selectedEdgeIds: state.selectedEdgeIds.filter(
+                    (id) => id !== action.payload.id,
+                ),
+                algorithmResult: null,
             };
         }
 
@@ -150,7 +183,9 @@ export function graphReducer(state: GraphState, action: Action): GraphState {
                 ...state,
                 selectedNodeIds: multi
                     ? state.selectedNodeIds.includes(id)
-                        ? state.selectedNodeIds.filter((nid) => nid !== id)
+                        ? state.selectedNodeIds.filter(
+                              (nodeId) => nodeId !== id,
+                          )
                         : [...state.selectedNodeIds, id]
                     : [id],
                 selectedEdgeIds: multi ? state.selectedEdgeIds : [],
@@ -163,7 +198,9 @@ export function graphReducer(state: GraphState, action: Action): GraphState {
                 ...state,
                 selectedEdgeIds: multi
                     ? state.selectedEdgeIds.includes(id)
-                        ? state.selectedEdgeIds.filter((eid) => eid !== id)
+                        ? state.selectedEdgeIds.filter(
+                              (edgeId) => edgeId !== id,
+                          )
                         : [...state.selectedEdgeIds, id]
                     : [id],
                 selectedNodeIds: multi ? state.selectedNodeIds : [],
@@ -215,12 +252,29 @@ export function graphReducer(state: GraphState, action: Action): GraphState {
                 ...state,
                 graph: {
                     ...state.graph,
-                    nodes: state.graph.nodes.map((n) =>
-                        n.id === action.payload.id
-                            ? { ...n, x: action.payload.x, y: action.payload.y }
-                            : n,
+                    nodes: state.graph.nodes.map((node) =>
+                        node.id === action.payload.id
+                            ? {
+                                  ...node,
+                                  x: action.payload.x,
+                                  y: action.payload.y,
+                              }
+                            : node,
                     ),
                 },
+                algorithmResult: null,
+            };
+
+        case "SET_ALGORITHM_RESULT":
+            return {
+                ...state,
+                algorithmResult: action.payload.result,
+            };
+
+        case "CLEAR_ALGORITHM_RESULT":
+            return {
+                ...state,
+                algorithmResult: null,
             };
 
         default:
