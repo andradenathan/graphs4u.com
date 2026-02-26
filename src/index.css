@@ -34,6 +34,10 @@
     --color-edge-selected: oklch(0.75 0.2 145);
     --color-grid: oklch(0.18 0.005 285);
 
+    --color-algo-visited: oklch(0.6 0.18 200);
+    --color-algo-result: oklch(0.72 0.2 145);
+    --color-algo-result-dim: oklch(0.35 0.005 285);
+
     --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
     --font-mono: "JetBrains Mono", ui-monospace, monospace;
 }
