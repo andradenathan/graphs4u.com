@@ -22,51 +22,57 @@ export function AlgorithmPanel() {
     const { t } = useI18n();
     const { graph, algorithmResult } = state;
 
-    const [selectedAlgo, setSelectedAlgo] = useState<AlgorithmId | null>(null);
+    const [selectedAlgorithm, setSelectedAlgorithm] =
+        useState<AlgorithmId | null>(null);
     const [sourceNodeId, setSourceNodeId] = useState<string>("");
     const [dropdownOpen, setDropdownOpen] = useState(false);
 
-    const selectedMeta = selectedAlgo
-        ? algorithms.find((a) => a.id === selectedAlgo) ?? null
+    const selectedMeta = selectedAlgorithm
+        ? (algorithms.find((algorithm) => algorithm.id === selectedAlgorithm) ??
+          null)
         : null;
 
-    function handleSelectAlgorithm(algo: AlgorithmMeta) {
-        setSelectedAlgo(algo.id);
+    function handleSelectAlgorithm(algorithm: AlgorithmMeta) {
+        setSelectedAlgorithm(algorithm.id);
         setDropdownOpen(false);
         clearAlgorithmResult();
 
-        if (algo.requiresWeighted && !graph.weighted) {
+        if (algorithm.requiresWeighted && !graph.weighted) {
             setWeighted(true);
         }
-        if (algo.requiresDirected && !graph.directed) {
+        if (algorithm.requiresDirected && !graph.directed) {
             setDirected(true);
         }
 
-        if (algo.requiresSource && graph.nodes.length > 0 && !sourceNodeId) {
+        if (
+            algorithm.requiresSource &&
+            graph.nodes.length > 0 &&
+            !sourceNodeId
+        ) {
             setSourceNodeId(graph.nodes[0].id);
         }
     }
 
     function handleRun() {
-        if (!selectedAlgo) return;
+        if (!selectedAlgorithm) return;
         if (selectedMeta?.requiresSource && !sourceNodeId) return;
         if (graph.nodes.length === 0) return;
 
         const result = runAlgorithm(
-            selectedAlgo,
+            selectedAlgorithm,
             graph,
             selectedMeta?.requiresSource ? sourceNodeId : undefined,
         );
 
         setAlgorithmResult({
-            algorithmId: selectedAlgo,
+            algorithmId: selectedAlgorithm,
             ...result,
         });
     }
 
     function handleClear() {
         clearAlgorithmResult();
-        setSelectedAlgo(null);
+        setSelectedAlgorithm(null);
         setSourceNodeId("");
     }
 
@@ -122,40 +128,47 @@ export function AlgorithmPanel() {
 
                     {dropdownOpen && (
                         <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-64 overflow-y-auto rounded-lg border border-border bg-surface-overlay shadow-xl">
-                            {categories.map((cat) => {
-                                const catAlgos = algorithms.filter(
-                                    (a) => a.category === cat.key,
+                            {categories.map((category) => {
+                                const categoryAlgorithms = algorithms.filter(
+                                    (algorithm) =>
+                                        algorithm.category === category.key,
                                 );
-                                if (catAlgos.length === 0) return null;
+                                if (categoryAlgorithms.length === 0)
+                                    return null;
                                 return (
-                                    <div key={cat.key}>
+                                    <div key={category.key}>
                                         <div className="px-3 pb-1 pt-2.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-                                            {t(cat.i18nKey)}
+                                            {t(category.i18nKey)}
                                         </div>
-                                        {catAlgos.map((algo) => (
+                                        {categoryAlgorithms.map((algorithm) => (
                                             <button
-                                                key={algo.id}
+                                                key={algorithm.id}
                                                 type="button"
                                                 onClick={() =>
-                                                    handleSelectAlgorithm(algo)
+                                                    handleSelectAlgorithm(
+                                                        algorithm,
+                                                    )
                                                 }
                                                 className={twMerge(
                                                     "flex w-full cursor-pointer items-center gap-2 px-3 py-1.5 text-xs transition-colors",
-                                                    selectedAlgo === algo.id
+                                                    selectedAlgorithm ===
+                                                        algorithm.id
                                                         ? "bg-primary/10 text-foreground"
                                                         : "text-muted-foreground hover:bg-surface-raised hover:text-foreground",
                                                 )}
                                             >
-                                                <span>{t(algo.i18nKey)}</span>
-                                                {(algo.requiresWeighted ||
-                                                    algo.requiresDirected) && (
+                                                <span>
+                                                    {t(algorithm.i18nKey)}
+                                                </span>
+                                                {(algorithm.requiresWeighted ||
+                                                    algorithm.requiresDirected) && (
                                                     <div className="ml-auto flex gap-1">
-                                                        {algo.requiresWeighted && (
+                                                        {algorithm.requiresWeighted && (
                                                             <span className="rounded bg-surface px-1 py-px text-[9px] text-muted-foreground">
                                                                 W
                                                             </span>
                                                         )}
-                                                        {algo.requiresDirected && (
+                                                        {algorithm.requiresDirected && (
                                                             <span className="rounded bg-surface px-1 py-px text-[9px] text-muted-foreground">
                                                                 D
                                                             </span>
@@ -172,7 +185,20 @@ export function AlgorithmPanel() {
                 </div>
 
                 {selectedMeta &&
-// ...existing code...
+                    (selectedMeta.requiresWeighted ||
+                        selectedMeta.requiresDirected) && (
+                        <p className="text-[10px] text-muted-foreground">
+                            {selectedMeta.requiresWeighted &&
+                                selectedMeta.requiresDirected &&
+                                t("algo.requiresBoth")}
+                            {selectedMeta.requiresWeighted &&
+                                !selectedMeta.requiresDirected &&
+                                t("algo.requiresWeighted")}
+                            {!selectedMeta.requiresWeighted &&
+                                selectedMeta.requiresDirected &&
+                                t("algo.requiresDirected")}
+                        </p>
+                    )}
             </div>
 
             {selectedMeta?.requiresSource && (
@@ -207,7 +233,7 @@ export function AlgorithmPanel() {
                     className="flex-1"
                     onClick={handleRun}
                     disabled={
-                        !selectedAlgo ||
+                        !selectedAlgorithm ||
                         graph.nodes.length === 0 ||
                         (selectedMeta?.requiresSource && !sourceNodeId)
                     }
@@ -239,7 +265,7 @@ export function AlgorithmPanel() {
                             </span>
                             <div className="flex flex-wrap gap-1">
                                 {graph.nodes.map((node) => {
-                                    const d =
+                                    const nodeDistance =
                                         algorithmResult.distances[node.id];
                                     return (
                                         <span
@@ -247,7 +273,9 @@ export function AlgorithmPanel() {
                                             className="rounded border border-border bg-surface px-1.5 py-0.5 text-[10px] tabular-nums text-foreground-subtle"
                                         >
                                             {node.label}:
-                                            {d === Infinity ? "∞" : d}
+                                            {nodeDistance === Infinity
+                                                ? "∞"
+                                                : nodeDistance}
                                         </span>
                                     );
                                 })}
