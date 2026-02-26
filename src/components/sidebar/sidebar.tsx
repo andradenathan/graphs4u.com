@@ -72,7 +72,7 @@ export function Sidebar() {
             {/* Tabs */}
             {!collapsed && (
                 <>
-                    <nav className="flex border-b border-border">
+                    <nav className="flex gap-1 border-b border-border px-2">
                         {tabs.map((tab) => {
                             const Icon = tab.icon;
                             return (
@@ -81,7 +81,7 @@ export function Sidebar() {
                                     type="button"
                                     onClick={() => setActiveTab(tab.id)}
                                     className={twMerge(
-                                        "flex flex-1 cursor-pointer items-center justify-center gap-1.5 border-b-2 px-3 py-2.5 text-xs font-medium transition-colors",
+                                        "flex flex-1 cursor-pointer items-center justify-center gap-1.5 border-b-2 px-2 py-2.5 text-xs font-medium transition-colors",
                                         activeTab === tab.id
                                             ? "border-primary text-foreground"
                                             : "border-transparent text-muted-foreground hover:text-foreground-subtle",

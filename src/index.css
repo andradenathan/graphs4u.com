@@ -1,1 +1,86 @@
 @import "tailwindcss";
+
+@theme {
+    --color-surface: oklch(0.145 0.005 285);
+    --color-surface-raised: oklch(0.178 0.005 285);
+    --color-surface-overlay: oklch(0.2 0.005 285);
+
+    --color-primary: oklch(0.65 0.18 250);
+    --color-primary-hover: oklch(0.58 0.18 250);
+    --color-primary-foreground: oklch(0.98 0 0);
+
+    --color-secondary: oklch(0.22 0.005 285);
+    --color-secondary-foreground: oklch(0.85 0.005 285);
+
+    --color-muted: oklch(0.2 0.005 285);
+    --color-muted-foreground: oklch(0.55 0.005 285);
+
+    --color-destructive: oklch(0.55 0.2 25);
+    --color-destructive-foreground: oklch(0.98 0 0);
+
+    --color-foreground: oklch(0.93 0.005 285);
+    --color-foreground-subtle: oklch(0.7 0.005 285);
+
+    --color-border: oklch(0.25 0.005 285);
+    --color-border-hover: oklch(0.35 0.005 285);
+    --color-input: oklch(0.22 0.005 285);
+
+    --color-ring: oklch(0.65 0.18 250);
+
+    --color-node: oklch(0.65 0.18 250);
+    --color-node-selected: oklch(0.75 0.2 145);
+    --color-node-hover: oklch(0.72 0.18 250);
+    --color-edge: oklch(0.4 0.005 285);
+    --color-edge-selected: oklch(0.75 0.2 145);
+    --color-grid: oklch(0.18 0.005 285);
+
+    --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+@layer base {
+    * {
+        border-color: var(--color-border);
+    }
+
+    body {
+        background-color: var(--color-surface);
+        color: var(--color-foreground);
+        font-family: var(--font-sans);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    ::selection {
+        background-color: oklch(0.65 0.18 250 / 0.3);
+    }
+
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    input[type="number"] {
+        -moz-appearance: textfield;
+        appearance: textfield;
+    }
+
+    ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: var(--color-border);
+        border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--color-border-hover);
+    }
+}
