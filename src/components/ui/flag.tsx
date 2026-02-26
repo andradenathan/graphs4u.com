@@ -7,8 +7,8 @@ interface FlagProps extends ComponentProps<"svg"> {
 }
 
 export function Flag({ code, size = 20, className, ...props }: FlagProps) {
-    const w = size;
-    const h = size * 0.667;
+    const width = size;
+    const height = size * 0.667;
 
     const shared = twMerge("rounded-sm inline-block shrink-0", className);
 
@@ -17,8 +17,8 @@ export function Flag({ code, size = 20, className, ...props }: FlagProps) {
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 190 100"
-                width={w}
-                height={h}
+                width={width}
+                height={height}
                 className={shared}
                 {...props}
             >
@@ -30,82 +30,82 @@ export function Flag({ code, size = 20, className, ...props }: FlagProps) {
                 <rect y="69.23" width="190" height="7.69" fill="#fff" />
                 <rect y="84.62" width="190" height="7.69" fill="#fff" />
                 <rect width="76" height="53.85" fill="#3C3B6E" />
-                {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((index) => (
                     <circle
-                        key={`r1-${i}`}
-                        cx={8 + i * 7.5}
+                        key={`r1-${index}`}
+                        cx={8 + index * 7.5}
                         cy={5.4}
                         r="1.8"
                         fill="#fff"
                     />
                 ))}
-                {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
+                {[0, 1, 2, 3, 4, 5, 6, 7].map((index) => (
                     <circle
-                        key={`r2-${i}`}
-                        cx={11.7 + i * 7.5}
+                        key={`r2-${index}`}
+                        cx={11.7 + index * 7.5}
                         cy={10.8}
                         r="1.8"
                         fill="#fff"
                     />
                 ))}
-                {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((index) => (
                     <circle
-                        key={`r3-${i}`}
-                        cx={8 + i * 7.5}
+                        key={`r3-${index}`}
+                        cx={8 + index * 7.5}
                         cy={16.2}
                         r="1.8"
                         fill="#fff"
                     />
                 ))}
-                {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
+                {[0, 1, 2, 3, 4, 5, 6, 7].map((index) => (
                     <circle
-                        key={`r4-${i}`}
-                        cx={11.7 + i * 7.5}
+                        key={`r4-${index}`}
+                        cx={11.7 + index * 7.5}
                         cy={21.6}
                         r="1.8"
                         fill="#fff"
                     />
                 ))}
-                {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((index) => (
                     <circle
-                        key={`r5-${i}`}
-                        cx={8 + i * 7.5}
+                        key={`r5-${index}`}
+                        cx={8 + index * 7.5}
                         cy={27}
                         r="1.8"
                         fill="#fff"
                     />
                 ))}
-                {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
+                {[0, 1, 2, 3, 4, 5, 6, 7].map((index) => (
                     <circle
-                        key={`r6-${i}`}
-                        cx={11.7 + i * 7.5}
+                        key={`r6-${index}`}
+                        cx={11.7 + index * 7.5}
                         cy={32.4}
                         r="1.8"
                         fill="#fff"
                     />
                 ))}
-                {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((index) => (
                     <circle
-                        key={`r7-${i}`}
-                        cx={8 + i * 7.5}
+                        key={`r7-${index}`}
+                        cx={8 + index * 7.5}
                         cy={37.8}
                         r="1.8"
                         fill="#fff"
                     />
                 ))}
-                {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
+                {[0, 1, 2, 3, 4, 5, 6, 7].map((index) => (
                     <circle
-                        key={`r8-${i}`}
-                        cx={11.7 + i * 7.5}
+                        key={`r8-${index}`}
+                        cx={11.7 + index * 7.5}
                         cy={43.2}
                         r="1.8"
                         fill="#fff"
                     />
                 ))}
-                {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((index) => (
                     <circle
-                        key={`r9-${i}`}
-                        cx={8 + i * 7.5}
+                        key={`r9-${index}`}
+                        cx={8 + index * 7.5}
                         cy={48.6}
                         r="1.8"
                         fill="#fff"
@@ -117,8 +117,8 @@ export function Flag({ code, size = 20, className, ...props }: FlagProps) {
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 150 100"
-                width={w}
-                height={h}
+                width={width}
+                height={height}
                 className={shared}
                 {...props}
             >
@@ -137,8 +137,8 @@ export function Flag({ code, size = 20, className, ...props }: FlagProps) {
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 150 100"
-                width={w}
-                height={h}
+                width={width}
+                height={height}
                 className={shared}
                 {...props}
             >
