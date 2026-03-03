@@ -2,7 +2,7 @@
 
 > Open-source graph algorithm visualizer — create, edit, and run algorithms on graphs interactively.
 
-![graphs4u screenshot](docs/graphs4u.png)
+<img src="docs/graphs4u.png" alt="graphs4u screenshot" width="900" />
 
 ![React](https://img.shields.io/badge/React-19-blue)
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)
