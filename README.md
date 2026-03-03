@@ -1,4 +1,4 @@
-<img src="docs/graphs4u.png" alt="graphs4u screenshot" width="900" />
+<img src="docs/graphs4u.png" alt="graphs4u screenshot" width="1200" />
 
 # graphs4u
 
