@@ -113,7 +113,7 @@ export function Header() {
                 <div className="h-4 w-px bg-border mx-1" />
 
                 <a
-                    href="https://github.com"
+                    href="https://github.com/andradenathan/graphs4u.com"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
@@ -133,7 +133,9 @@ export function Header() {
                     className="text-muted-foreground hover:text-primary"
                 >
                     <Heart />
-                    <span className="hidden sm:inline">{t("header.donate")}</span>
+                    <span className="hidden sm:inline">
+                        {t("header.donate")}
+                    </span>
                 </Button>
             </div>
 
