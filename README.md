@@ -2,6 +2,8 @@
 
 > Open-source graph algorithm visualizer — create, edit, and run algorithms on graphs interactively.
 
+![graphs4u screenshot](docs/graphs4u.png)
+
 ![React](https://img.shields.io/badge/React-19-blue)
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-blue)
@@ -63,6 +65,10 @@ src/
 └── main.tsx             # Entry point
 ```
 
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to open issues and submit pull requests.
+
 ## License
 
-MIT
+MIT — see [LICENSE.md](LICENSE.md) for details.
