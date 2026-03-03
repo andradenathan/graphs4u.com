@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from "react";
-import { Waypoints, Github, Trash2, ChevronDown } from "lucide-react";
+import { Waypoints, Github, Trash2, ChevronDown, Heart } from "lucide-react";
 import { useGraph } from "@/hooks/use-graph";
 import { useI18n } from "@/hooks/use-i18n";
 import { languages, type LanguageCode } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
+import { DonateDialog } from "@/components/layout/donate-dialog";
 
 export function Header() {
     const { state, clearGraph } = useGraph();
@@ -12,6 +13,7 @@ export function Header() {
     const edgeCount = state.graph.edges.length;
 
     const [languageDropdownOpen, setLanguageDropdownOpen] = useState(false);
+    const [donateDialogOpen, setDonateDialogOpen] = useState(false);
     const languageDropdownRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -121,7 +123,24 @@ export function Header() {
                         {t("header.openSource")}
                     </span>
                 </a>
+
+                <div className="h-4 w-px bg-border mx-1" />
+
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setDonateDialogOpen(true)}
+                    className="text-muted-foreground hover:text-primary"
+                >
+                    <Heart />
+                    <span className="hidden sm:inline">{t("header.donate")}</span>
+                </Button>
             </div>
+
+            <DonateDialog
+                open={donateDialogOpen}
+                onClose={() => setDonateDialogOpen(false)}
+            />
         </header>
     );
 }

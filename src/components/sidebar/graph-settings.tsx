@@ -3,7 +3,7 @@ import { useGraph } from "@/hooks/use-graph";
 import { useI18n } from "@/hooks/use-i18n";
 import { Toggle } from "@/components/ui/toggle";
 import { Button } from "@/components/ui/button";
-import { exportGraphAsPdf } from "@/lib/export-pdf";
+import { exportGraphAsPdf } from "@/lib/pdf";
 
 export function GraphSettings() {
     const { state, setDirected, setWeighted } = useGraph();
@@ -60,7 +60,7 @@ export function GraphSettings() {
                         variant="secondary"
                         size="sm"
                         className="mt-1 w-full"
-                        onClick={() => exportGraphAsPdf(state.graph)}
+                        onClick={() => void exportGraphAsPdf(state.graph)}
                         disabled={state.graph.nodes.length === 0}
                     >
                         <FileDown />
