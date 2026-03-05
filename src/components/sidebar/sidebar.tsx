@@ -48,7 +48,7 @@ export function Sidebar() {
             data-slot="sidebar"
             className={twMerge(
                 "flex shrink-0 flex-col border-r border-border bg-surface transition-[width] duration-200",
-                collapsed ? "w-12" : "w-72",
+                collapsed ? "w-12" : "w-80",
             )}
         >
             <div className="flex h-10 items-center justify-between border-b border-border px-2">
@@ -79,16 +79,16 @@ export function Sidebar() {
                                     type="button"
                                     onClick={() => setActiveTab(tab.id)}
                                     className={twMerge(
-                                        "flex flex-1 cursor-pointer items-center justify-center gap-1.5 border-b-2 px-2 py-2.5 text-xs font-medium transition-colors",
+                                        "flex flex-1 min-w-0 cursor-pointer items-center justify-center gap-1.5 border-b-2 px-2 py-2.5 text-xs font-medium transition-colors",
                                         activeTab === tab.id
                                             ? "border-primary text-foreground"
                                             : "border-transparent text-muted-foreground hover:text-foreground-subtle",
                                     )}
                                 >
-                                    <Icon className="size-3.5" />
+                                    <Icon className="size-3.5 shrink-0" />
                                     {tab.label}
                                     {tab.count !== undefined && (
-                                        <span className="ml-0.5 rounded bg-surface-raised px-1 py-px text-[10px] tabular-nums text-muted-foreground">
+                                        <span className="shrink-0 rounded bg-surface-raised px-1 py-px text-[10px] tabular-nums text-muted-foreground">
                                             {tab.count}
                                         </span>
                                     )}

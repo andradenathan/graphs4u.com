@@ -60,7 +60,7 @@ export function GraphSettings() {
                         variant="secondary"
                         size="sm"
                         className="mt-1 w-full"
-                        onClick={() => void exportGraphAsPdf(state.graph)}
+                        onClick={() => void exportGraphAsPdf(state.graph, state.algorithmResult)}
                         disabled={state.graph.nodes.length === 0}
                     >
                         <FileDown />
