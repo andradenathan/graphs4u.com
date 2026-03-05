@@ -20,7 +20,7 @@ const translations: Record<LanguageCode, Record<string, string>> = {
             "graphs4u is free and open source. If it helps you, consider supporting its development.",
         "donate.close": "Close",
         "donate.github.title": "GitHub Sponsors",
-        "donate.github.description": "Recurring support via GitHub",
+        "donate.github.description": "Support via GitHub — one-time or monthly",
 
         "sidebar.title": "Graph",
         "sidebar.nodes": "Nodes",
@@ -105,7 +105,8 @@ const translations: Record<LanguageCode, Record<string, string>> = {
             "graphs4u é gratuito e de código aberto. Se ele te ajuda, considere apoiar o desenvolvimento.",
         "donate.close": "Fechar",
         "donate.github.title": "GitHub Sponsors",
-        "donate.github.description": "Apoio recorrente via GitHub",
+        "donate.github.description":
+            "Apoie via GitHub — doação única ou mensal",
 
         "sidebar.title": "Grafo",
         "sidebar.nodes": "Nós",
