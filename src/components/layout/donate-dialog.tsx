@@ -1,11 +1,10 @@
 import { useEffect } from "react";
-import { X, Heart, Github, CreditCard } from "lucide-react";
+import { X, Heart, Github } from "lucide-react";
 import { twMerge } from "tailwind-merge";
 import { useI18n } from "@/hooks/use-i18n";
 import { Button } from "@/components/ui/button";
 
 const GITHUB_SPONSORS_URL = "https://github.com/sponsors/andradenathan";
-const STRIPE_DONATE_URL = "#"; // TODO: add Stripe payment link
 
 interface DonateDialogProps {
     open: boolean;
@@ -59,53 +58,28 @@ export function DonateDialog({ open, onClose }: DonateDialogProps) {
                         {t("donate.description")}
                     </p>
 
-                    <div className="flex flex-col gap-3">
-                        <a
-                            href={GITHUB_SPONSORS_URL}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className={twMerge(
-                                "flex items-center gap-3 rounded-lg border border-border bg-surface-raised px-4 py-3",
-                                "transition-colors hover:border-border-hover hover:bg-surface-overlay",
-                                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                            )}
-                        >
-                            <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-surface-overlay">
-                                <Github className="size-4 text-foreground" />
-                            </div>
-                            <div className="flex flex-col">
-                                <span className="text-sm font-medium text-foreground">
-                                    {t("donate.github.title")}
-                                </span>
-                                <span className="text-xs text-muted-foreground">
-                                    {t("donate.github.description")}
-                                </span>
-                            </div>
-                        </a>
-
-                        <a
-                            href={STRIPE_DONATE_URL}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className={twMerge(
-                                "flex items-center gap-3 rounded-lg border border-border bg-surface-raised px-4 py-3",
-                                "transition-colors hover:border-border-hover hover:bg-surface-overlay",
-                                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                            )}
-                        >
-                            <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-surface-overlay">
-                                <CreditCard className="size-4 text-foreground" />
-                            </div>
-                            <div className="flex flex-col">
-                                <span className="text-sm font-medium text-foreground">
-                                    {t("donate.stripe.title")}
-                                </span>
-                                <span className="text-xs text-muted-foreground">
-                                    {t("donate.stripe.description")}
-                                </span>
-                            </div>
-                        </a>
-                    </div>
+                    <a
+                        href={GITHUB_SPONSORS_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={twMerge(
+                            "flex items-center gap-3 rounded-lg border border-border bg-surface-raised px-4 py-3",
+                            "transition-colors hover:border-border-hover hover:bg-surface-overlay",
+                            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                        )}
+                    >
+                        <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-surface-overlay">
+                            <Github className="size-4 text-foreground" />
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="text-sm font-medium text-foreground">
+                                {t("donate.github.title")}
+                            </span>
+                            <span className="text-xs text-muted-foreground">
+                                {t("donate.github.description")}
+                            </span>
+                        </div>
+                    </a>
                 </div>
 
                 <div className="border-t border-border px-5 py-3">

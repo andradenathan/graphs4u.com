@@ -16,12 +16,11 @@ const translations: Record<LanguageCode, Record<string, string>> = {
         "header.donate": "Donate",
 
         "donate.title": "Support the project",
-        "donate.description": "graphs4u is free and open source. If it helps you, consider supporting its development.",
+        "donate.description":
+            "graphs4u is free and open source. If it helps you, consider supporting its development.",
         "donate.close": "Close",
         "donate.github.title": "GitHub Sponsors",
         "donate.github.description": "Recurring support via GitHub",
-        "donate.stripe.title": "One-time donation",
-        "donate.stripe.description": "Single contribution via Stripe",
 
         "sidebar.title": "Graph",
         "sidebar.nodes": "Nodes",
@@ -102,12 +101,11 @@ const translations: Record<LanguageCode, Record<string, string>> = {
         "header.donate": "Apoie",
 
         "donate.title": "Apoie o projeto",
-        "donate.description": "graphs4u é gratuito e de código aberto. Se ele te ajuda, considere apoiar o desenvolvimento.",
+        "donate.description":
+            "graphs4u é gratuito e de código aberto. Se ele te ajuda, considere apoiar o desenvolvimento.",
         "donate.close": "Fechar",
         "donate.github.title": "GitHub Sponsors",
         "donate.github.description": "Apoio recorrente via GitHub",
-        "donate.stripe.title": "Doação única",
-        "donate.stripe.description": "Contribuição avulsa via Stripe",
 
         "sidebar.title": "Grafo",
         "sidebar.nodes": "Nós",
