@@ -7,6 +7,7 @@ export const iconButtonVariants = tv({
         "inline-flex cursor-pointer items-center justify-center rounded-lg border transition-colors",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
         "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        "md:data-[touch-target]:hidden",
     ],
     variants: {
         variant: {
