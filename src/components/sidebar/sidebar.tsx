@@ -16,7 +16,11 @@ import { twMerge } from "tailwind-merge";
 
 type SidebarTab = "nodes" | "edges" | "settings";
 
-export function Sidebar() {
+interface SidebarProps {
+    onClose?: () => void;
+}
+
+export function Sidebar({ onClose }: SidebarProps) {
     const [collapsed, setCollapsed] = useState(false);
     const [activeTab, setActiveTab] = useState<SidebarTab>("nodes");
     const { state } = useGraph();
@@ -47,7 +51,7 @@ export function Sidebar() {
         <aside
             data-slot="sidebar"
             className={twMerge(
-                "flex shrink-0 flex-col border-r border-border bg-surface transition-[width] duration-200",
+                "flex shrink-0 flex-col border-r border-border bg-surface transition-[width] duration-200 h-full",
                 collapsed ? "w-12" : "w-80",
             )}
         >
@@ -57,15 +61,39 @@ export function Sidebar() {
                         {t("sidebar.title")}
                     </span>
                 )}
-                <IconButton
-                    aria-label={
-                        collapsed ? "Expand sidebar" : "Collapse sidebar"
-                    }
-                    onClick={() => setCollapsed(!collapsed)}
-                    size="sm"
-                >
-                    {collapsed ? <PanelLeftOpen /> : <PanelLeftClose />}
-                </IconButton>
+                {collapsed || onClose ? (
+                    <div className="flex gap-1">
+                        {onClose && (
+                            <IconButton
+                                aria-label="Close sidebar"
+                                onClick={onClose}
+                                size="sm"
+                                className="md:hidden"
+                            >
+                                <PanelLeftClose />
+                            </IconButton>
+                        )}
+                        <IconButton
+                            aria-label={
+                                collapsed ? "Expand sidebar" : "Collapse sidebar"
+                            }
+                            onClick={() => setCollapsed(!collapsed)}
+                            size="sm"
+                        >
+                            {collapsed ? <PanelLeftOpen /> : <PanelLeftClose />}
+                        </IconButton>
+                    </div>
+                ) : (
+                    <IconButton
+                        aria-label={
+                            collapsed ? "Expand sidebar" : "Collapse sidebar"
+                        }
+                        onClick={() => setCollapsed(!collapsed)}
+                        size="sm"
+                    >
+                        {collapsed ? <PanelLeftOpen /> : <PanelLeftClose />}
+                    </IconButton>
+                )}
             </div>
 
             {!collapsed && (

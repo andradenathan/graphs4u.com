@@ -1,12 +1,17 @@
 import { useState, useRef, useEffect } from "react";
-import { Waypoints, Github, Trash2, ChevronDown, Heart } from "lucide-react";
+import { Waypoints, Github, Trash2, ChevronDown, Heart, Menu } from "lucide-react";
 import { useGraph } from "@/hooks/use-graph";
 import { useI18n } from "@/hooks/use-i18n";
 import { languages, type LanguageCode } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/ui/icon-button";
 import { DonateDialog } from "@/components/layout/donate-dialog";
 
-export function Header() {
+interface HeaderProps {
+    onSidebarToggle?: () => void;
+}
+
+export function Header({ onSidebarToggle }: HeaderProps) {
     const { state, clearGraph } = useGraph();
     const { lang, setLang, t } = useI18n();
     const nodeCount = state.graph.nodes.length;
@@ -36,19 +41,28 @@ export function Header() {
     return (
         <header
             data-slot="header"
-            className="flex h-12 shrink-0 items-center justify-between border-b border-border bg-surface px-4"
+            className="flex h-12 shrink-0 items-center justify-between border-b border-border bg-surface px-3 md:px-4"
         >
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 md:gap-3 min-w-0">
+                <IconButton
+                    aria-label="Toggle sidebar"
+                    onClick={onSidebarToggle}
+                    size="sm"
+                    className="md:hidden"
+                >
+                    <Menu className="size-5" />
+                </IconButton>
+
                 <div className="flex items-center gap-2">
-                    <Waypoints className="size-5 text-primary" />
-                    <span className="text-sm font-semibold tracking-tight text-foreground">
+                    <Waypoints className="size-5 text-primary flex-shrink-0" />
+                    <span className="text-sm font-semibold tracking-tight text-foreground hidden sm:inline">
                         graphs4u
                     </span>
                 </div>
 
-                <div className="h-4 w-px bg-border" />
+                <div className="h-4 w-px bg-border hidden md:block" />
 
-                <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                <div className="flex items-center gap-2 md:gap-3 text-xs text-muted-foreground hidden md:flex">
                     <span>
                         {nodeCount}{" "}
                         {nodeCount === 1 ? t("header.node") : t("header.nodes")}
@@ -62,18 +76,17 @@ export function Header() {
 
             <div className="flex items-center gap-1">
                 {(nodeCount > 0 || edgeCount > 0) && (
-                    <Button
-                        variant="ghost"
-                        size="sm"
+                    <IconButton
+                        aria-label={t("header.clear")}
                         onClick={clearGraph}
+                        size="sm"
                         className="text-muted-foreground hover:text-destructive"
                     >
                         <Trash2 />
-                        {t("header.clear")}
-                    </Button>
+                    </IconButton>
                 )}
 
-                <div className="h-4 w-px bg-border mx-1" />
+                <div className="h-4 w-px bg-border mx-1 hidden md:block" />
 
                 <div ref={languageDropdownRef} className="relative">
                     <button
@@ -83,7 +96,8 @@ export function Header() {
                         }
                         className="inline-flex cursor-pointer items-center gap-1 rounded-lg px-2 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-surface-raised hover:text-foreground"
                     >
-                        <span>{currentLanguage.label}</span>
+                        <span className="hidden md:inline">{currentLanguage.label}</span>
+                        <span className="md:hidden text-[10px] font-semibold">{currentLanguage.code.toUpperCase()}</span>
                         <ChevronDown className="size-3 opacity-60" />
                     </button>
 
@@ -110,33 +124,51 @@ export function Header() {
                     )}
                 </div>
 
-                <div className="h-4 w-px bg-border mx-1" />
+                <div className="h-4 w-px bg-border mx-1 hidden md:block" />
 
                 <a
                     href="https://github.com/andradenathan/graphs4u.com"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
+                    className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs text-muted-foreground transition-colors hover:text-foreground hidden md:flex"
                 >
                     <Github className="size-4" />
-                    <span className="hidden sm:inline">
+                    <span className="hidden lg:inline">
                         {t("header.openSource")}
                     </span>
                 </a>
 
-                <div className="h-4 w-px bg-border mx-1" />
+                <a
+                    href="https://github.com/andradenathan/graphs4u.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex md:hidden items-center rounded-lg px-2 py-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
+                >
+                    <Github className="size-4" />
+                </a>
+
+                <div className="h-4 w-px bg-border mx-1 hidden md:block" />
 
                 <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => setDonateDialogOpen(true)}
-                    className="text-muted-foreground hover:text-primary"
+                    className="text-muted-foreground hover:text-primary hidden md:flex"
                 >
                     <Heart />
-                    <span className="hidden sm:inline">
+                    <span className="hidden lg:inline">
                         {t("header.donate")}
                     </span>
                 </Button>
+
+                <IconButton
+                    aria-label={t("header.donate")}
+                    onClick={() => setDonateDialogOpen(true)}
+                    size="sm"
+                    className="md:hidden text-muted-foreground hover:text-primary"
+                >
+                    <Heart />
+                </IconButton>
             </div>
 
             <DonateDialog

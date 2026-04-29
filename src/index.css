@@ -88,3 +88,26 @@
         background: var(--color-border-hover);
     }
 }
+
+@layer utilities {
+    /* Touch-friendly adjustments for mobile */
+    @media (max-width: 768px) {
+        /* Minimum touch target size for interactive elements */
+        [data-slot="node-list"] > div,
+        [data-slot="edge-list"] > div {
+            @apply min-h-11;
+        }
+
+        /* Ensure buttons have adequate touch targets */
+        [data-slot="node-list"] [data-slot="icon-button"],
+        [data-slot="edge-list"] [data-slot="icon-button"] {
+            @apply min-h-11 min-w-11;
+        }
+
+        /* Add bottom padding to account for mobile toolbar */
+        [data-slot="graph-board"] {
+            @apply pb-20;
+        }
+    }
+}
+
