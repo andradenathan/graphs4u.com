@@ -62,7 +62,7 @@ export function Header({ onSidebarToggle }: HeaderProps) {
 
                 <div className="h-4 w-px bg-border hidden md:block" />
 
-                <div className="flex items-center gap-2 md:gap-3 text-xs text-muted-foreground hidden md:flex">
+                <div className="hidden items-center gap-2 text-xs text-muted-foreground md:flex md:gap-3">
                     <span>
                         {nodeCount}{" "}
                         {nodeCount === 1 ? t("header.node") : t("header.nodes")}
@@ -130,21 +130,13 @@ export function Header({ onSidebarToggle }: HeaderProps) {
                     href="https://github.com/andradenathan/graphs4u.com"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs text-muted-foreground transition-colors hover:text-foreground hidden md:flex"
+                    aria-label={t("header.openSource")}
+                    className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
                 >
                     <Github className="size-4" />
                     <span className="hidden lg:inline">
                         {t("header.openSource")}
                     </span>
-                </a>
-
-                <a
-                    href="https://github.com/andradenathan/graphs4u.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex md:hidden items-center rounded-lg px-2 py-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
-                >
-                    <Github className="size-4" />
                 </a>
 
                 <div className="h-4 w-px bg-border mx-1 hidden md:block" />
