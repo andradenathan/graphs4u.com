@@ -29,6 +29,7 @@ export type Action =
     | { type: "SET_DIRECTED"; payload: { directed: boolean } }
     | { type: "SET_WEIGHTED"; payload: { weighted: boolean } }
     | { type: "CLEAR_GRAPH" }
+    | { type: "LOAD_GRAPH"; payload: { graph: Graph } }
     | { type: "MOVE_NODE"; payload: { id: string; x: number; y: number } }
     | { type: "SET_ALGORITHM_RESULT"; payload: { result: AlgorithmResult } }
     | { type: "CLEAR_ALGORITHM_RESULT" };
@@ -245,6 +246,16 @@ export function graphReducer(state: GraphState, action: Action): GraphState {
             return {
                 ...initialState,
                 activeTool: state.activeTool,
+            };
+
+        case "LOAD_GRAPH":
+            // Keep new node labels going after the loaded ones instead of
+            // restarting at A and colliding with them.
+            nodeCounter = action.payload.graph.nodes.length;
+            return {
+                ...initialState,
+                activeTool: state.activeTool,
+                graph: action.payload.graph,
             };
 
         case "MOVE_NODE":

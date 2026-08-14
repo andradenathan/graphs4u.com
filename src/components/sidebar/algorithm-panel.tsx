@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Play, X, FlaskConical, ChevronDown } from "lucide-react";
 import { useGraph } from "@/hooks/use-graph";
 import { useI18n } from "@/hooks/use-i18n";
@@ -10,6 +11,7 @@ import {
     type AlgorithmMeta,
 } from "@/lib/algorithms";
 import { twMerge } from "tailwind-merge";
+import { ALGORITHM_QUERY_PARAMETER } from "@/lib/graph-serialization";
 
 export function AlgorithmPanel() {
     const {
@@ -26,6 +28,9 @@ export function AlgorithmPanel() {
         useState<AlgorithmId | null>(null);
     const [sourceNodeId, setSourceNodeId] = useState<string>("");
     const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [requestedAlgorithmApplied, setRequestedAlgorithmApplied] =
+        useState(false);
+    const [searchParams] = useSearchParams();
 
     const selectedMeta = selectedAlgorithm
         ? (algorithms.find((algorithm) => algorithm.id === selectedAlgorithm) ??
@@ -52,6 +57,20 @@ export function AlgorithmPanel() {
             setSourceNodeId(graph.nodes[0].id);
         }
     }
+
+    // A link from a content page can preselect its algorithm. It is applied once
+    // the shared graph has landed, so the source node can be filled in too.
+    useEffect(() => {
+        if (requestedAlgorithmApplied || graph.nodes.length === 0) return;
+
+        const requestedAlgorithm = algorithms.find(
+            (algorithm) =>
+                algorithm.id === searchParams.get(ALGORITHM_QUERY_PARAMETER),
+        );
+        setRequestedAlgorithmApplied(true);
+        if (requestedAlgorithm) handleSelectAlgorithm(requestedAlgorithm);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [graph.nodes.length, requestedAlgorithmApplied, searchParams]);
 
     function handleRun() {
         if (!selectedAlgorithm) return;

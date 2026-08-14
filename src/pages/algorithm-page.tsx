@@ -8,6 +8,7 @@ import { useI18n } from "@/hooks/use-i18n";
 import { algorithms, runAlgorithm, type AlgorithmId } from "@/lib/algorithms";
 import { algorithmExamples } from "@/lib/example-graphs";
 import { describeAlgorithmResult } from "@/lib/algorithm-result-description";
+import { buildGraphLink } from "@/lib/graph-serialization";
 import { algorithmContents } from "@/content/algorithm-content";
 import {
 	buildAlgorithmPath,
@@ -38,6 +39,13 @@ export function AlgorithmPage({ algorithmId }: AlgorithmPageProps) {
 		exampleResult,
 		lang,
 	);
+
+	// The button opens the editor with this page's example already loaded.
+	const editorLink = buildGraphLink({
+		graph: example.graph,
+		algorithmId,
+		basePath: buildHomePath(lang),
+	});
 
 	const relatedAlgorithms = content.relatedAlgorithmIds
 		.map((relatedId) => algorithms.find((entry) => entry.id === relatedId))
@@ -131,7 +139,7 @@ export function AlgorithmPage({ algorithmId }: AlgorithmPageProps) {
 								{content.summary}
 							</p>
 							<Link
-								to={buildHomePath(lang)}
+								to={editorLink}
 								className="inline-flex w-fit items-center gap-2 rounded-lg border border-primary bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary-hover"
 							>
 								{t("content.openInEditor")}

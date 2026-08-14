@@ -4,6 +4,7 @@ import { useI18n } from "@/hooks/use-i18n";
 import { Toggle } from "@/components/ui/toggle";
 import { Button } from "@/components/ui/button";
 import { exportGraphAsPdf } from "@/lib/pdf";
+import { GraphTemplatesPanel } from "@/components/sidebar/graph-templates-panel";
 
 export function GraphSettings() {
     const { state, setDirected, setWeighted } = useGraph();
@@ -12,6 +13,8 @@ export function GraphSettings() {
 
     return (
         <div className="flex flex-col gap-7" data-slot="graph-settings">
+            <GraphTemplatesPanel />
+
             <div className="flex flex-col gap-3">
                 <h4 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                     {t("settings.graphType")}

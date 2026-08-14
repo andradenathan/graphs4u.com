@@ -8,6 +8,7 @@ import { buildHomePath, translatePath } from "@/lib/routes";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { DonateDialog } from "@/components/layout/donate-dialog";
+import { ShareGraphButton } from "@/components/layout/share-graph-button";
 
 interface HeaderProps {
     onSidebarToggle?: () => void;
@@ -84,6 +85,8 @@ export function Header({ onSidebarToggle }: HeaderProps) {
             </div>
 
             <div className="flex items-center gap-1">
+                {nodeCount > 0 && <ShareGraphButton />}
+
                 {(nodeCount > 0 || edgeCount > 0) && (
                     <IconButton
                         aria-label={t("header.clear")}

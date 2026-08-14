@@ -1,9 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/sidebar/sidebar";
 import { GraphBoard } from "@/components/board/graph-board";
 import { Seo } from "@/components/seo/seo";
 import { useI18n } from "@/hooks/use-i18n";
+import { useGraph } from "@/hooks/use-graph";
+import {
+	decodeGraph,
+	GRAPH_QUERY_PARAMETER,
+} from "@/lib/graph-serialization";
 import type { LanguageCode } from "@/lib/i18n";
 import { buildHomePath } from "@/lib/routes";
 import {
@@ -26,8 +32,19 @@ const boardPageSeo: Record<LanguageCode, { title: string; description: string }>
 
 export function BoardPage() {
 	const { lang } = useI18n();
+	const { loadGraph } = useGraph();
+	const [searchParams] = useSearchParams();
 	const [sidebarOpen, setSidebarOpen] = useState(false);
 	const seo = boardPageSeo[lang];
+	const encodedGraph = searchParams.get(GRAPH_QUERY_PARAMETER);
+
+	// A shared link carries the whole graph in the query string. Applying it in
+	// an effect keeps the prerendered markup and the first client render equal.
+	useEffect(() => {
+		if (!encodedGraph) return;
+		const sharedGraph = decodeGraph(encodedGraph);
+		if (sharedGraph) loadGraph(sharedGraph);
+	}, [encodedGraph, loadGraph]);
 
 	return (
 		<>
