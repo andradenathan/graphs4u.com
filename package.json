@@ -5,7 +5,7 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
-        "build": "tsc -b && vite build",
+        "build": "tsc -b && vite-react-ssg build && node scripts/postbuild.mjs",
         "lint": "eslint .",
         "assets:og": "node scripts/generate-og.mjs",
         "assets:icons": "node scripts/generate-icons.mjs",
