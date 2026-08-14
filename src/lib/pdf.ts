@@ -1,4 +1,3 @@
-import { jsPDF } from "jspdf";
 import type { Graph, AlgorithmResult } from "@/types/graph";
 
 const NODE_RADIUS = 22;
@@ -233,6 +232,8 @@ export async function exportGraphAsPdf(
     const margin = 36;
     const headerHeight = 52;
     const footerHeight = 24;
+
+    const { jsPDF } = await import("jspdf");
 
     const pdfDocument = new jsPDF({
         orientation: "landscape",

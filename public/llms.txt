@@ -1,0 +1,43 @@
+# graphs4u
+
+> Free, open-source, browser-based graph algorithm visualizer. Users draw a graph (nodes and edges, optionally directed and/or weighted) directly on a canvas and run classic graph algorithms on it, seeing every visited node and edge highlighted, plus the numeric result. No account, no install, no data leaves the browser.
+
+- **Site:** https://graphs4u.com/
+- **Repository:** https://github.com/andradenathan/graphs4u.com
+- **License:** MIT
+- **Languages:** English, Portuguese (pt-BR)
+- **Runs entirely client-side:** graphs are never uploaded to a server.
+
+## What it does
+
+Users place nodes on a board, connect them with edges, choose whether the graph is directed and whether edges carry weights, then pick an algorithm and a source node. The result is shown on the board (visited nodes/edges, result set) and as text (traversal order, distances, total cost), and can be exported to PDF.
+
+## Algorithms available
+
+| Algorithm | Purpose | Time complexity | Requires weights | Handles negative weights |
+|---|---|---|---|---|
+| BFS (breadth-first search) | Traversal / shortest path in unweighted graphs | O(V + E) | No | N/A |
+| DFS (depth-first search) | Traversal / reachability | O(V + E) | No | N/A |
+| Dijkstra | Single-source shortest path | O((V + E) log V) | Yes | No |
+| Bellman-Ford | Single-source shortest path, detects negative cycles | O(V · E) | Yes | Yes |
+| Kruskal | Minimum spanning tree | O(E log E) | Yes | Yes |
+| Prim | Minimum spanning tree | O(E log V) | Yes | Yes |
+| Topological sort | Linear ordering of a DAG | O(V + E) | No | N/A |
+
+## Common questions
+
+**Is graphs4u free?** Yes. It is free and open source under the MIT license, with no account and no paid tier.
+
+**Does it work offline?** Yes, it is a static client-side application and can be installed as a PWA.
+
+**Which algorithm should I use for shortest path?** Use BFS for unweighted graphs, Dijkstra for non-negative weights, and Bellman-Ford when any edge weight can be negative or you need negative-cycle detection.
+
+**Kruskal or Prim for a minimum spanning tree?** Both give a minimum spanning tree. Kruskal sorts edges globally and suits sparse graphs; Prim grows a tree from one source node and suits dense graphs.
+
+## Keyboard shortcuts
+
+`V` select · `N` add node · `E` add edge · `D` delete · `Del`/`Backspace` delete selection · `Esc` clear selection · `Shift + click` multi-select · scroll to zoom.
+
+## Optional
+
+- [Contributing guide](https://github.com/andradenathan/graphs4u.com/blob/main/CONTRIBUTING.md): how to open issues and pull requests.

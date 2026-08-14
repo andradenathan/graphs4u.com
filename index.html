@@ -2,16 +2,108 @@
 <html lang="en" class="dark">
 	<head>
 		<meta charset="UTF-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<meta name="description" content="graphs4u — Open source graph algorithm visualizer" />
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-		<title>graphs4u — Graph Algorithm Visualizer</title>
+
+		<title>graphs4u — Free Graph Algorithm Visualizer (BFS, DFS, Dijkstra)</title>
+		<meta
+			name="description"
+			content="Draw a graph in your browser and run BFS, DFS, Dijkstra, Bellman-Ford, Kruskal, Prim and topological sort step by step. Free, open source, no sign-up."
+		/>
+		<link rel="canonical" href="https://graphs4u.com/" />
+
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+		<link rel="manifest" href="/manifest.webmanifest" />
+		<meta name="theme-color" content="#18181b" />
+		<meta name="color-scheme" content="dark" />
+
+		<meta property="og:type" content="website" />
+		<meta property="og:site_name" content="graphs4u" />
+		<meta property="og:url" content="https://graphs4u.com/" />
+		<meta property="og:title" content="graphs4u — Free Graph Algorithm Visualizer" />
+		<meta
+			property="og:description"
+			content="Draw a graph in your browser and run BFS, DFS, Dijkstra, Bellman-Ford, Kruskal, Prim and topological sort step by step. Free, open source, no sign-up."
+		/>
+		<meta property="og:image" content="https://graphs4u.com/og/default.png" />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta property="og:image:alt" content="graphs4u — build graphs, run algorithms" />
+		<meta property="og:locale" content="en_US" />
+		<meta property="og:locale:alternate" content="pt_BR" />
+
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content="graphs4u — Free Graph Algorithm Visualizer" />
+		<meta
+			name="twitter:description"
+			content="Draw a graph in your browser and run BFS, DFS, Dijkstra, Bellman-Ford, Kruskal, Prim and topological sort step by step."
+		/>
+		<meta name="twitter:image" content="https://graphs4u.com/og/default.png" />
+
+		<script type="application/ld+json">
+			{
+				"@context": "https://schema.org",
+				"@graph": [
+					{
+						"@type": "SoftwareApplication",
+						"@id": "https://graphs4u.com/#app",
+						"name": "graphs4u",
+						"url": "https://graphs4u.com/",
+						"applicationCategory": "EducationalApplication",
+						"applicationSubCategory": "Graph algorithm visualizer",
+						"operatingSystem": "Any (web browser)",
+						"browserRequirements": "Requires JavaScript",
+						"description": "Interactive graph editor that runs classic graph algorithms — BFS, DFS, Dijkstra, Bellman-Ford, Kruskal, Prim and topological sort — on graphs you draw yourself.",
+						"inLanguage": ["en", "pt-BR"],
+						"isAccessibleForFree": true,
+						"license": "https://opensource.org/licenses/MIT",
+						"offers": {
+							"@type": "Offer",
+							"price": "0",
+							"priceCurrency": "USD"
+						},
+						"featureList": [
+							"Interactive graph editor with directed and weighted graphs",
+							"Breadth-first search (BFS)",
+							"Depth-first search (DFS)",
+							"Dijkstra shortest path",
+							"Bellman-Ford shortest path with negative weights",
+							"Kruskal minimum spanning tree",
+							"Prim minimum spanning tree",
+							"Topological sort",
+							"Export results to PDF"
+						],
+						"softwareHelp": "https://github.com/andradenathan/graphs4u.com",
+						"codeRepository": "https://github.com/andradenathan/graphs4u.com"
+					},
+					{
+						"@type": "WebSite",
+						"@id": "https://graphs4u.com/#website",
+						"url": "https://graphs4u.com/",
+						"name": "graphs4u",
+						"inLanguage": "en",
+						"publisher": { "@id": "https://graphs4u.com/#app" }
+					}
+				]
+			}
+		</script>
 	</head>
 	<body>
 		<div id="root"></div>
+		<noscript>
+			<div style="max-width: 42rem; margin: 4rem auto; padding: 0 1.5rem; font-family: system-ui, sans-serif; color: #e6e6ea; background: #18181b;">
+				<h1>graphs4u — graph algorithm visualizer</h1>
+				<p>
+					graphs4u lets you draw a graph in the browser and run classic graph algorithms on it:
+					breadth-first search (BFS), depth-first search (DFS), Dijkstra, Bellman-Ford, Kruskal,
+					Prim and topological sort. It is free, open source (MIT) and requires no account.
+				</p>
+				<p>
+					The editor needs JavaScript to run. Please enable JavaScript, or read the
+					<a href="https://github.com/andradenathan/graphs4u.com" style="color: #5b7ef6;">source code on GitHub</a>.
+				</p>
+			</div>
+		</noscript>
 		<script type="module" src="/src/main.tsx"></script>
 	</body>
 </html>
