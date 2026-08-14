@@ -92,9 +92,32 @@ const directedAcyclicGraph = buildGraph(
 	{ directed: true, weighted: false },
 );
 
+const disconnectedGraph = buildGraph(
+	[
+		["a", "b", 1],
+		["b", "d", 1],
+		["c", "f", 1],
+	],
+	{ directed: false, weighted: false },
+);
+
+const flowNetworkGraph = buildGraph(
+	[
+		["a", "b", 4],
+		["a", "d", 3],
+		["b", "c", 3],
+		["b", "e", 2],
+		["d", "e", 2],
+		["c", "f", 3],
+		["e", "f", 3],
+	],
+	{ directed: true, weighted: true },
+);
+
 export interface AlgorithmExample {
 	graph: Graph;
 	sourceId: string | null;
+	targetId?: string | null;
 }
 
 export const algorithmExamples: Record<AlgorithmId, AlgorithmExample> = {
@@ -105,6 +128,10 @@ export const algorithmExamples: Record<AlgorithmId, AlgorithmExample> = {
 	kruskal: { graph: weightedGraph, sourceId: null },
 	prim: { graph: weightedGraph, sourceId: "a" },
 	"topological-sort": { graph: directedAcyclicGraph, sourceId: null },
+	"a-star": { graph: weightedGraph, sourceId: "a", targetId: "f" },
+	"floyd-warshall": { graph: weightedGraph, sourceId: "a" },
+	"connected-components": { graph: disconnectedGraph, sourceId: null },
+	"max-flow": { graph: flowNetworkGraph, sourceId: "a", targetId: "f" },
 };
 
 export const EXAMPLE_VIEW_BOX = { width: 490, height: 275 } as const;

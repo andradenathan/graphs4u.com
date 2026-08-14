@@ -30,13 +30,22 @@ export const algorithmSlugs: Record<AlgorithmId, Record<LanguageCode, string>> =
 	kruskal: { en: "kruskal", pt: "kruskal" },
 	prim: { en: "prim", pt: "prim" },
 	"topological-sort": { en: "topological-sort", pt: "ordenacao-topologica" },
+	"a-star": { en: "a-star", pt: "a-estrela" },
+	"floyd-warshall": { en: "floyd-warshall", pt: "floyd-warshall" },
+	"connected-components": {
+		en: "connected-components",
+		pt: "componentes-conexos",
+	},
+	"max-flow": { en: "max-flow", pt: "fluxo-maximo" },
 };
 
 function withLanguagePrefix(language: LanguageCode, path: string): string {
 	const normalizedPath = path.replace(/^\/+|\/+$/g, "");
 	const prefix = language === DEFAULT_LANGUAGE ? "" : `/${language}`;
-	if (!normalizedPath) return prefix || "/";
-	return `${prefix}/${normalizedPath}`;
+	// Trailing slash matches what GitHub Pages serves for nested output, so
+	// internal links never bounce through a redirect.
+	if (!normalizedPath) return prefix ? `${prefix}/` : "/";
+	return `${prefix}/${normalizedPath}/`;
 }
 
 export function buildHomePath(language: LanguageCode): string {

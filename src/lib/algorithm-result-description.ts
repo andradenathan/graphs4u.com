@@ -25,6 +25,29 @@ export function describeAlgorithmResult(
 			.join(" → ")}`;
 	}
 
+	if (algorithmId === "a-star") {
+		if (result.resultNodeIds.length === 0) return t("result.noPath", language);
+		const path = result.resultNodeIds.map(labelOf).join(" → ");
+		const cost = result.metrics?.pathCost ?? 0;
+		const expanded = result.metrics?.expandedNodeCount ?? 0;
+		return `${t("result.path", language)}: ${path} (${t("result.cost", language)} ${cost}, ${expanded} ${t("result.expanded", language)})`;
+	}
+
+	if (algorithmId === "connected-components") {
+		return `${t("result.components", language)}: ${result.metrics?.componentCount ?? 0}`;
+	}
+
+	if (algorithmId === "max-flow") {
+		return `${t("result.maxFlow", language)}: ${result.metrics?.maxFlow ?? 0}`;
+	}
+
+	if (algorithmId === "floyd-warshall") {
+		const distances = result.resultNodeIds
+			.map((nodeId) => `${labelOf(nodeId)} = ${result.distances[nodeId] ?? "∞"}`)
+			.join(", ");
+		return `${t("result.allPairs", language)}: ${distances}`;
+	}
+
 	if (algorithmId === "bfs" || algorithmId === "dfs") {
 		return `${t("result.visitOrder", language)}: ${result.resultNodeIds
 			.map(labelOf)

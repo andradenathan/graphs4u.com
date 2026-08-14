@@ -7,6 +7,10 @@ import { bellmanFordContent } from "@/content/algorithms/bellman-ford";
 import { kruskalContent } from "@/content/algorithms/kruskal";
 import { primContent } from "@/content/algorithms/prim";
 import { topologicalSortContent } from "@/content/algorithms/topological-sort";
+import { aStarContent } from "@/content/algorithms/a-star";
+import { floydWarshallContent } from "@/content/algorithms/floyd-warshall";
+import { connectedComponentsContent } from "@/content/algorithms/connected-components";
+import { maxFlowContent } from "@/content/algorithms/max-flow";
 
 export interface AlgorithmFact {
 	label: string;
@@ -49,4 +53,8 @@ export const algorithmContents: Record<AlgorithmId, AlgorithmContent> = {
 	kruskal: kruskalContent,
 	prim: primContent,
 	"topological-sort": topologicalSortContent,
+	"a-star": aStarContent,
+	"floyd-warshall": floydWarshallContent,
+	"connected-components": connectedComponentsContent,
+	"max-flow": maxFlowContent,
 };

@@ -32,6 +32,7 @@ export function AlgorithmPage({ algorithmId }: AlgorithmPageProps) {
 		algorithmId,
 		example.graph,
 		example.sourceId ?? undefined,
+		example.targetId ?? undefined,
 	);
 	const exampleResultDescription = describeAlgorithmResult(
 		algorithmId,

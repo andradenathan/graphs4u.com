@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
-import { Play, X, FlaskConical, ChevronDown } from "lucide-react";
+import { Link, useSearchParams } from "react-router-dom";
+import { Play, X, FlaskConical, ChevronDown, BookOpen } from "lucide-react";
 import { useGraph } from "@/hooks/use-graph";
 import { useI18n } from "@/hooks/use-i18n";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import {
 } from "@/lib/algorithms";
 import { twMerge } from "tailwind-merge";
 import { ALGORITHM_QUERY_PARAMETER } from "@/lib/graph-serialization";
+import { buildAlgorithmPath } from "@/lib/routes";
 
 export function AlgorithmPanel() {
     const {
@@ -21,12 +22,13 @@ export function AlgorithmPanel() {
         setAlgorithmResult,
         clearAlgorithmResult,
     } = useGraph();
-    const { t } = useI18n();
+    const { lang, t } = useI18n();
     const { graph, algorithmResult } = state;
 
     const [selectedAlgorithm, setSelectedAlgorithm] =
         useState<AlgorithmId | null>(null);
     const [sourceNodeId, setSourceNodeId] = useState<string>("");
+    const [targetNodeId, setTargetNodeId] = useState<string>("");
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [requestedAlgorithmApplied, setRequestedAlgorithmApplied] =
         useState(false);
@@ -56,6 +58,10 @@ export function AlgorithmPanel() {
         ) {
             setSourceNodeId(graph.nodes[0].id);
         }
+
+        if (algorithm.requiresTarget && graph.nodes.length > 1 && !targetNodeId) {
+            setTargetNodeId(graph.nodes[graph.nodes.length - 1].id);
+        }
     }
 
     // A link from a content page can preselect its algorithm. It is applied once
@@ -77,10 +83,13 @@ export function AlgorithmPanel() {
         if (selectedMeta?.requiresSource && !sourceNodeId) return;
         if (graph.nodes.length === 0) return;
 
+        if (selectedMeta?.requiresTarget && !targetNodeId) return;
+
         const result = runAlgorithm(
             selectedAlgorithm,
             graph,
             selectedMeta?.requiresSource ? sourceNodeId : undefined,
+            selectedMeta?.requiresTarget ? targetNodeId : undefined,
         );
 
         setAlgorithmResult({
@@ -93,10 +102,13 @@ export function AlgorithmPanel() {
         clearAlgorithmResult();
         setSelectedAlgorithm(null);
         setSourceNodeId("");
+        setTargetNodeId("");
     }
 
     const categories = [
         { key: "traversal", i18nKey: "algo.cat.traversal" },
+        { key: "components", i18nKey: "algo.cat.components" },
+        { key: "flow", i18nKey: "algo.cat.flow" },
         { key: "shortest-path", i18nKey: "algo.cat.shortestPath" },
         { key: "mst", i18nKey: "algo.cat.mst" },
         { key: "ordering", i18nKey: "algo.cat.ordering" },
@@ -203,6 +215,16 @@ export function AlgorithmPanel() {
                     )}
                 </div>
 
+                {selectedMeta && (
+                    <Link
+                        to={buildAlgorithmPath(selectedMeta.id, lang)}
+                        className="inline-flex w-fit items-center gap-1.5 text-[11px] text-primary transition-colors hover:text-primary-hover"
+                    >
+                        <BookOpen className="size-3" />
+                        {t("algo.learnMore")}
+                    </Link>
+                )}
+
                 {selectedMeta &&
                     (selectedMeta.requiresWeighted ||
                         selectedMeta.requiresDirected) && (
@@ -245,6 +267,33 @@ export function AlgorithmPanel() {
                 </div>
             )}
 
+            {selectedMeta?.requiresTarget && (
+                <div className="flex flex-col gap-2">
+                    <h4 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                        {t("algo.targetNode")}
+                    </h4>
+                    <div className="flex flex-wrap gap-1.5">
+                        {graph.nodes.map((node) => (
+                            <button
+                                key={node.id}
+                                type="button"
+                                onClick={() => setTargetNodeId(node.id)}
+                                disabled={node.id === sourceNodeId}
+                                className={twMerge(
+                                    "flex size-8 cursor-pointer items-center justify-center rounded-lg border text-xs font-medium transition-colors",
+                                    "disabled:pointer-events-none disabled:opacity-40",
+                                    targetNodeId === node.id
+                                        ? "border-algo-result bg-algo-result/15 text-foreground"
+                                        : "border-border bg-surface-raised text-muted-foreground hover:border-border-hover hover:text-foreground",
+                                )}
+                            >
+                                {node.label}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
+
             <div className="flex gap-2">
                 <Button
                     variant="primary"
@@ -254,7 +303,8 @@ export function AlgorithmPanel() {
                     disabled={
                         !selectedAlgorithm ||
                         graph.nodes.length === 0 ||
-                        (selectedMeta?.requiresSource && !sourceNodeId)
+                        (selectedMeta?.requiresSource && !sourceNodeId) ||
+                        (selectedMeta?.requiresTarget && !targetNodeId)
                     }
                 >
                     <Play className="size-3.5" />

@@ -53,45 +53,42 @@ export function GraphSettings() {
                     {t("settings.export")}
                 </h4>
 
-                <div className="flex flex-col gap-2 rounded-lg bg-surface-raised px-3 py-3">
+                <div className="flex flex-col gap-3 rounded-lg bg-surface-raised px-3 py-3">
                     <div className="flex flex-col gap-0.5">
                         <span className="text-sm text-foreground">
-                            {t("settings.exportPdf")}
+                            {t("settings.exportDesc")}
                         </span>
                         <span className="text-[11px] text-muted-foreground">
-                            {t("settings.exportPdfDesc")}
+                            {t("settings.exportFormats")}
                         </span>
                     </div>
-                    <Button
-                        variant="secondary"
-                        size="sm"
-                        className="mt-1 w-full"
-                        onClick={() => void exportGraphAsPdf(state.graph, state.algorithmResult)}
-                        disabled={state.graph.nodes.length === 0}
-                    >
-                        <FileDown />
-                        {t("settings.exportPdf")}
-                    </Button>
-                </div>
 
-                <div className="flex flex-col gap-2 rounded-lg bg-surface-raised px-3 py-3">
-                    <div className="flex flex-col gap-0.5">
-                        <span className="text-sm text-foreground">
+                    <div className="flex flex-col gap-1.5">
+                        <Button
+                            variant="secondary"
+                            size="sm"
+                            className="w-full justify-start"
+                            onClick={() =>
+                                void exportGraphAsPdf(
+                                    state.graph,
+                                    state.algorithmResult,
+                                )
+                            }
+                            disabled={state.graph.nodes.length === 0}
+                        >
+                            <FileDown />
+                            {t("settings.exportPdf")}
+                        </Button>
+                        <Button
+                            variant="secondary"
+                            size="sm"
+                            className="w-full justify-start"
+                            onClick={() => setIoDialogOpen(true)}
+                        >
+                            <ArrowLeftRight />
                             {t("io.open")}
-                        </span>
-                        <span className="text-[11px] text-muted-foreground">
-                            {t("io.hint.adjacency-matrix")}
-                        </span>
+                        </Button>
                     </div>
-                    <Button
-                        variant="secondary"
-                        size="sm"
-                        className="mt-1 w-full"
-                        onClick={() => setIoDialogOpen(true)}
-                    >
-                        <ArrowLeftRight />
-                        {t("io.open")}
-                    </Button>
                 </div>
             </div>
 

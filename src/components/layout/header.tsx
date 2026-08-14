@@ -1,10 +1,22 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Waypoints, Github, Trash2, ChevronDown, Heart, Menu } from "lucide-react";
+import {
+    Waypoints,
+    Github,
+    Trash2,
+    ChevronDown,
+    Heart,
+    Menu,
+    BookOpen,
+} from "lucide-react";
 import { useGraph } from "@/hooks/use-graph";
 import { useI18n } from "@/hooks/use-i18n";
 import { languages } from "@/lib/i18n";
-import { buildHomePath, translatePath } from "@/lib/routes";
+import {
+    buildAlgorithmsIndexPath,
+    buildHomePath,
+    translatePath,
+} from "@/lib/routes";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { DonateDialog } from "@/components/layout/donate-dialog";
@@ -67,6 +79,18 @@ export function Header({ onSidebarToggle }: HeaderProps) {
                     <Waypoints className="size-5 text-primary flex-shrink-0" />
                     <span className="text-sm font-semibold tracking-tight text-foreground hidden sm:inline">
                         graphs4u
+                    </span>
+                </Link>
+
+                <div className="h-4 w-px bg-border hidden md:block" />
+
+                <Link
+                    to={buildAlgorithmsIndexPath(lang)}
+                    className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-surface-raised hover:text-foreground"
+                >
+                    <BookOpen className="size-4 shrink-0" />
+                    <span className="hidden sm:inline">
+                        {t("header.learn")}
                     </span>
                 </Link>
 
