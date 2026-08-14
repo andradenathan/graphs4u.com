@@ -1,31 +1,22 @@
-import { createContext, useState, useCallback, type ReactNode } from "react";
+import { createContext, useCallback, useMemo, type ReactNode } from "react";
 import { t as translate, type LanguageCode } from "@/lib/i18n";
 
 export interface I18nContextValue {
-    lang: LanguageCode;
-    setLang: (lang: LanguageCode) => void;
-    t: (key: string) => string;
+	lang: LanguageCode;
+	t: (key: string) => string;
 }
 
 export const I18nContext = createContext<I18nContextValue | null>(null);
 
-function getInitialLang(): LanguageCode {
-    const stored = localStorage.getItem("graphs4u-lang");
-    if (stored === "pt" || stored === "en") return stored;
-    const browserLanguage = navigator.language.slice(0, 2);
-    if (browserLanguage === "pt") return "pt";
-    return "en";
+export interface I18nProviderProps {
+	/** Language comes from the URL, so every page has a stable, crawlable locale. */
+	lang: LanguageCode;
+	children: ReactNode;
 }
 
-export function I18nProvider({ children }: { children: ReactNode }) {
-    const [lang, setLangState] = useState<LanguageCode>(getInitialLang);
+export function I18nProvider({ lang, children }: I18nProviderProps) {
+	const t = useCallback((key: string) => translate(key, lang), [lang]);
+	const value = useMemo(() => ({ lang, t }), [lang, t]);
 
-    const setLang = useCallback((code: LanguageCode) => {
-        setLangState(code);
-        localStorage.setItem("graphs4u-lang", code);
-    }, []);
-
-    const t = useCallback((key: string) => translate(key, lang), [lang]);
-
-    return <I18nContext value={{ lang, setLang, t }}>{children}</I18nContext>;
+	return <I18nContext value={value}>{children}</I18nContext>;
 }

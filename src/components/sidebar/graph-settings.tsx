@@ -1,17 +1,23 @@
-import { FileDown } from "lucide-react";
+import { useState } from "react";
+import { ArrowLeftRight, FileDown } from "lucide-react";
 import { useGraph } from "@/hooks/use-graph";
 import { useI18n } from "@/hooks/use-i18n";
 import { Toggle } from "@/components/ui/toggle";
 import { Button } from "@/components/ui/button";
 import { exportGraphAsPdf } from "@/lib/pdf";
+import { GraphTemplatesPanel } from "@/components/sidebar/graph-templates-panel";
+import { GraphIoDialog } from "@/components/layout/graph-io-dialog";
 
 export function GraphSettings() {
     const { state, setDirected, setWeighted } = useGraph();
     const { t } = useI18n();
     const { directed, weighted } = state.graph;
+    const [ioDialogOpen, setIoDialogOpen] = useState(false);
 
     return (
         <div className="flex flex-col gap-7" data-slot="graph-settings">
+            <GraphTemplatesPanel />
+
             <div className="flex flex-col gap-3">
                 <h4 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                     {t("settings.graphType")}
@@ -47,27 +53,49 @@ export function GraphSettings() {
                     {t("settings.export")}
                 </h4>
 
-                <div className="flex flex-col gap-2 rounded-lg bg-surface-raised px-3 py-3">
+                <div className="flex flex-col gap-3 rounded-lg bg-surface-raised px-3 py-3">
                     <div className="flex flex-col gap-0.5">
                         <span className="text-sm text-foreground">
-                            {t("settings.exportPdf")}
+                            {t("settings.exportDesc")}
                         </span>
                         <span className="text-[11px] text-muted-foreground">
-                            {t("settings.exportPdfDesc")}
+                            {t("settings.exportFormats")}
                         </span>
                     </div>
-                    <Button
-                        variant="secondary"
-                        size="sm"
-                        className="mt-1 w-full"
-                        onClick={() => void exportGraphAsPdf(state.graph, state.algorithmResult)}
-                        disabled={state.graph.nodes.length === 0}
-                    >
-                        <FileDown />
-                        {t("settings.exportPdf")}
-                    </Button>
+
+                    <div className="flex flex-col gap-1.5">
+                        <Button
+                            variant="secondary"
+                            size="sm"
+                            className="w-full justify-start"
+                            onClick={() =>
+                                void exportGraphAsPdf(
+                                    state.graph,
+                                    state.algorithmResult,
+                                )
+                            }
+                            disabled={state.graph.nodes.length === 0}
+                        >
+                            <FileDown />
+                            {t("settings.exportPdf")}
+                        </Button>
+                        <Button
+                            variant="secondary"
+                            size="sm"
+                            className="w-full justify-start"
+                            onClick={() => setIoDialogOpen(true)}
+                        >
+                            <ArrowLeftRight />
+                            {t("io.open")}
+                        </Button>
+                    </div>
                 </div>
             </div>
+
+            <GraphIoDialog
+                open={ioDialogOpen}
+                onClose={() => setIoDialogOpen(false)}
+            />
 
             <div className="flex flex-col gap-2">
                 <h4 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">

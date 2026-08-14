@@ -1,5 +1,6 @@
 import { createContext, useReducer, useCallback, type ReactNode } from "react";
 import type {
+    Graph,
     GraphNode,
     GraphEdge,
     GraphState,
@@ -23,6 +24,7 @@ export interface GraphContextValue {
     updateNode: (id: string, updates: Partial<Omit<GraphNode, "id">>) => void;
     updateEdge: (id: string, updates: Partial<Omit<GraphEdge, "id">>) => void;
     clearGraph: () => void;
+    loadGraph: (graph: Graph) => void;
     setDirected: (directed: boolean) => void;
     setWeighted: (weighted: boolean) => void;
     setAlgorithmResult: (result: AlgorithmResult) => void;
@@ -92,6 +94,10 @@ export function GraphProvider({ children }: { children: ReactNode }) {
         dispatch({ type: "CLEAR_GRAPH" });
     }, []);
 
+    const loadGraph = useCallback((graph: Graph) => {
+        dispatch({ type: "LOAD_GRAPH", payload: { graph } });
+    }, []);
+
     const setDirected = useCallback((directed: boolean) => {
         dispatch({ type: "SET_DIRECTED", payload: { directed } });
     }, []);
@@ -125,6 +131,7 @@ export function GraphProvider({ children }: { children: ReactNode }) {
                 updateNode,
                 updateEdge,
                 clearGraph,
+                loadGraph,
                 setDirected,
                 setWeighted,
                 setAlgorithmResult,

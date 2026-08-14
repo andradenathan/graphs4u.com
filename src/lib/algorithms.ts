@@ -7,7 +7,11 @@ export type AlgorithmId =
     | "bellman-ford"
     | "kruskal"
     | "prim"
-    | "topological-sort";
+    | "topological-sort"
+    | "a-star"
+    | "floyd-warshall"
+    | "connected-components"
+    | "max-flow";
 
 export interface AlgorithmStep {
     visitedNodeIds: string[];
@@ -16,6 +20,16 @@ export interface AlgorithmStep {
     resultEdgeIds: string[];
     distances: Record<string, number>;
     description: string;
+    /**
+     * Scalars that cannot be recovered from the node and edge sets alone, such
+     * as the value of a maximum flow. Used to describe results in any language.
+     */
+    metrics?: {
+        maxFlow?: number;
+        componentCount?: number;
+        expandedNodeCount?: number;
+        pathCost?: number;
+    };
 }
 
 export interface AlgorithmMeta {
@@ -24,7 +38,15 @@ export interface AlgorithmMeta {
     requiresWeighted: boolean;
     requiresDirected: boolean;
     requiresSource: boolean;
-    category: "traversal" | "shortest-path" | "mst" | "ordering";
+    /** Algorithms that also need a destination node, such as A* and max flow. */
+    requiresTarget?: boolean;
+    category:
+        | "traversal"
+        | "shortest-path"
+        | "mst"
+        | "ordering"
+        | "components"
+        | "flow";
 }
 
 export const algorithms: AlgorithmMeta[] = [
@@ -83,6 +105,40 @@ export const algorithms: AlgorithmMeta[] = [
         requiresDirected: true,
         requiresSource: false,
         category: "ordering",
+    },
+    {
+        id: "a-star",
+        i18nKey: "algo.aStar",
+        requiresWeighted: true,
+        requiresDirected: false,
+        requiresSource: true,
+        requiresTarget: true,
+        category: "shortest-path",
+    },
+    {
+        id: "floyd-warshall",
+        i18nKey: "algo.floydWarshall",
+        requiresWeighted: true,
+        requiresDirected: false,
+        requiresSource: true,
+        category: "shortest-path",
+    },
+    {
+        id: "connected-components",
+        i18nKey: "algo.connectedComponents",
+        requiresWeighted: false,
+        requiresDirected: false,
+        requiresSource: false,
+        category: "components",
+    },
+    {
+        id: "max-flow",
+        i18nKey: "algo.maxFlow",
+        requiresWeighted: true,
+        requiresDirected: true,
+        requiresSource: true,
+        requiresTarget: true,
+        category: "flow",
     },
 ];
 
@@ -452,10 +508,356 @@ export function runTopologicalSort(graph: Graph): AlgorithmStep {
     };
 }
 
+function euclideanDistance(
+    first: { x: number; y: number },
+    second: { x: number; y: number },
+): number {
+    return Math.hypot(second.x - first.x, second.y - first.y);
+}
+
+/**
+ * Largest factor that keeps the straight-line heuristic admissible: every edge
+ * must cost at least its pixel length times this factor, so the heuristic can
+ * never overestimate the real cost.
+ */
+function buildHeuristicScale(graph: Graph): number {
+    const nodeById = new Map(graph.nodes.map((node) => [node.id, node]));
+    let scale = Infinity;
+
+    for (const edge of graph.edges) {
+        const source = nodeById.get(edge.source);
+        const target = nodeById.get(edge.target);
+        if (!source || !target) continue;
+
+        const length = euclideanDistance(source, target);
+        if (length === 0) continue;
+        scale = Math.min(scale, edge.weight / length);
+    }
+
+    return Number.isFinite(scale) && scale > 0 ? scale : 0;
+}
+
+export function runAStar(
+    graph: Graph,
+    sourceId: string,
+    targetId: string,
+): AlgorithmStep {
+    const adjacency = buildAdjacencyList(graph);
+    const nodeById = new Map(graph.nodes.map((node) => [node.id, node]));
+    const target = nodeById.get(targetId);
+    const heuristicScale = buildHeuristicScale(graph);
+
+    const heuristic = (nodeId: string) => {
+        const node = nodeById.get(nodeId);
+        if (!node || !target) return 0;
+        return euclideanDistance(node, target) * heuristicScale;
+    };
+
+    const costFromSource: Record<string, number> = {};
+    const predecessorEdges: Record<string, string | null> = {};
+    const predecessors: Record<string, string | null> = {};
+    for (const node of graph.nodes) {
+        costFromSource[node.id] = Infinity;
+        predecessorEdges[node.id] = null;
+        predecessors[node.id] = null;
+    }
+    costFromSource[sourceId] = 0;
+
+    const settled = new Set<string>();
+    const visitOrder: string[] = [];
+    const openSet = new Set<string>([sourceId]);
+
+    while (openSet.size > 0) {
+        let currentId: string | null = null;
+        let bestEstimate = Infinity;
+        for (const candidateId of openSet) {
+            const estimate = costFromSource[candidateId] + heuristic(candidateId);
+            if (estimate < bestEstimate) {
+                bestEstimate = estimate;
+                currentId = candidateId;
+            }
+        }
+        if (currentId === null) break;
+
+        openSet.delete(currentId);
+        settled.add(currentId);
+        visitOrder.push(currentId);
+        if (currentId === targetId) break;
+
+        for (const neighbor of adjacency.get(currentId) ?? []) {
+            if (settled.has(neighbor.nodeId)) continue;
+            const candidateCost = costFromSource[currentId] + neighbor.weight;
+            if (candidateCost < costFromSource[neighbor.nodeId]) {
+                costFromSource[neighbor.nodeId] = candidateCost;
+                predecessors[neighbor.nodeId] = currentId;
+                predecessorEdges[neighbor.nodeId] = neighbor.edgeId;
+                openSet.add(neighbor.nodeId);
+            }
+        }
+    }
+
+    const pathNodeIds: string[] = [];
+    const pathEdgeIds: string[] = [];
+    if (costFromSource[targetId] !== Infinity) {
+        let cursor: string | null = targetId;
+        while (cursor) {
+            pathNodeIds.unshift(cursor);
+            const edgeId = predecessorEdges[cursor];
+            if (edgeId) pathEdgeIds.unshift(edgeId);
+            cursor = predecessors[cursor];
+        }
+    }
+
+    const targetCost = costFromSource[targetId];
+    return {
+        visitedNodeIds: visitOrder,
+        visitedEdgeIds: pathEdgeIds,
+        resultNodeIds: pathNodeIds,
+        resultEdgeIds: pathEdgeIds,
+        distances: costFromSource,
+        metrics: {
+            expandedNodeCount: visitOrder.length,
+            pathCost: targetCost === Infinity ? undefined : targetCost,
+        },
+        description:
+            targetCost === Infinity
+                ? `A*: no path from ${findNodeLabel(graph, sourceId)} to ${findNodeLabel(graph, targetId)}`
+                : `A*: ${pathNodeIds.map((nodeId) => findNodeLabel(graph, nodeId)).join(" → ")} (cost ${targetCost}, ${visitOrder.length} nodes expanded)`,
+    };
+}
+
+export function runFloydWarshall(
+    graph: Graph,
+    sourceId: string,
+): AlgorithmStep {
+    const nodeIds = graph.nodes.map((node) => node.id);
+    const distanceMatrix = new Map<string, Map<string, number>>();
+
+    for (const fromId of nodeIds) {
+        const row = new Map<string, number>();
+        for (const toId of nodeIds) {
+            row.set(toId, fromId === toId ? 0 : Infinity);
+        }
+        distanceMatrix.set(fromId, row);
+    }
+
+    for (const edge of graph.edges) {
+        const forwardRow = distanceMatrix.get(edge.source);
+        if (forwardRow && edge.weight < (forwardRow.get(edge.target) ?? Infinity)) {
+            forwardRow.set(edge.target, edge.weight);
+        }
+        if (!graph.directed) {
+            const backwardRow = distanceMatrix.get(edge.target);
+            if (
+                backwardRow &&
+                edge.weight < (backwardRow.get(edge.source) ?? Infinity)
+            ) {
+                backwardRow.set(edge.source, edge.weight);
+            }
+        }
+    }
+
+    for (const throughId of nodeIds) {
+        for (const fromId of nodeIds) {
+            const throughCost = distanceMatrix.get(fromId)?.get(throughId) ?? Infinity;
+            if (throughCost === Infinity) continue;
+
+            for (const toId of nodeIds) {
+                const restCost =
+                    distanceMatrix.get(throughId)?.get(toId) ?? Infinity;
+                if (restCost === Infinity) continue;
+
+                const candidate = throughCost + restCost;
+                if (candidate < (distanceMatrix.get(fromId)?.get(toId) ?? Infinity)) {
+                    distanceMatrix.get(fromId)?.set(toId, candidate);
+                }
+            }
+        }
+    }
+
+    const hasNegativeCycle = nodeIds.some(
+        (nodeId) => (distanceMatrix.get(nodeId)?.get(nodeId) ?? 0) < 0,
+    );
+
+    const distancesFromSource: Record<string, number> = {};
+    for (const nodeId of nodeIds) {
+        distancesFromSource[nodeId] =
+            distanceMatrix.get(sourceId)?.get(nodeId) ?? Infinity;
+    }
+
+    const reachableNodeIds = nodeIds.filter(
+        (nodeId) => distancesFromSource[nodeId] !== Infinity,
+    );
+
+    return {
+        visitedNodeIds: reachableNodeIds,
+        visitedEdgeIds: [],
+        resultNodeIds: reachableNodeIds,
+        resultEdgeIds: [],
+        distances: distancesFromSource,
+        description: hasNegativeCycle
+            ? "Floyd-Warshall: negative cycle detected"
+            : `Floyd-Warshall: all-pairs matrix computed (${nodeIds.length}² entries), showing row of ${findNodeLabel(graph, sourceId)}`,
+    };
+}
+
+export function runConnectedComponents(graph: Graph): AlgorithmStep {
+    // Direction is ignored on purpose: this is (weak) connectivity.
+    const adjacency = buildAdjacencyList(graph);
+    const undirectedAdjacency = new Map<string, Neighbor[]>();
+    for (const node of graph.nodes) {
+        undirectedAdjacency.set(node.id, [...(adjacency.get(node.id) ?? [])]);
+    }
+    if (graph.directed) {
+        for (const edge of graph.edges) {
+            undirectedAdjacency.get(edge.target)?.push({
+                nodeId: edge.source,
+                edgeId: edge.id,
+                weight: edge.weight,
+            });
+        }
+    }
+
+    const visited = new Set<string>();
+    const components: string[][] = [];
+    const componentEdgeIds: string[] = [];
+
+    for (const node of graph.nodes) {
+        if (visited.has(node.id)) continue;
+
+        const component: string[] = [];
+        const stack = [node.id];
+        visited.add(node.id);
+
+        while (stack.length > 0) {
+            const currentId = stack.pop()!;
+            component.push(currentId);
+
+            for (const neighbor of undirectedAdjacency.get(currentId) ?? []) {
+                if (visited.has(neighbor.nodeId)) continue;
+                visited.add(neighbor.nodeId);
+                componentEdgeIds.push(neighbor.edgeId);
+                stack.push(neighbor.nodeId);
+            }
+        }
+
+        components.push(component);
+    }
+
+    const componentSummary = components
+        .map(
+            (component) =>
+                `{${component.map((nodeId) => findNodeLabel(graph, nodeId)).join(", ")}}`,
+        )
+        .join(" ");
+
+    return {
+        visitedNodeIds: graph.nodes.map((node) => node.id),
+        visitedEdgeIds: componentEdgeIds,
+        resultNodeIds: graph.nodes.map((node) => node.id),
+        resultEdgeIds: componentEdgeIds,
+        distances: {},
+        metrics: { componentCount: components.length },
+        description: `Connected components: ${components.length} — ${componentSummary}`,
+    };
+}
+
+export function runMaxFlow(
+    graph: Graph,
+    sourceId: string,
+    sinkId: string,
+): AlgorithmStep {
+    // Edmonds-Karp: BFS augmenting paths over a residual capacity map.
+    const residualCapacity = new Map<string, Map<string, number>>();
+    const edgeIdByPair = new Map<string, string>();
+
+    const ensureRow = (nodeId: string) => {
+        if (!residualCapacity.has(nodeId)) {
+            residualCapacity.set(nodeId, new Map<string, number>());
+        }
+        return residualCapacity.get(nodeId)!;
+    };
+
+    for (const node of graph.nodes) ensureRow(node.id);
+
+    for (const edge of graph.edges) {
+        const forwardRow = ensureRow(edge.source);
+        ensureRow(edge.target);
+        forwardRow.set(
+            edge.target,
+            (forwardRow.get(edge.target) ?? 0) + Math.max(edge.weight, 0),
+        );
+        edgeIdByPair.set(`${edge.source}>${edge.target}`, edge.id);
+    }
+
+    let maxFlow = 0;
+    const usedEdgeIds = new Set<string>();
+    const visitedNodeIds = new Set<string>([sourceId]);
+
+    while (true) {
+        const predecessor = new Map<string, string>();
+        const queue = [sourceId];
+        predecessor.set(sourceId, sourceId);
+
+        while (queue.length > 0 && !predecessor.has(sinkId)) {
+            const currentId = queue.shift()!;
+            for (const [neighborId, capacity] of residualCapacity.get(currentId) ??
+                []) {
+                if (capacity > 0 && !predecessor.has(neighborId)) {
+                    predecessor.set(neighborId, currentId);
+                    visitedNodeIds.add(neighborId);
+                    queue.push(neighborId);
+                }
+            }
+        }
+
+        if (!predecessor.has(sinkId)) break;
+
+        let bottleneck = Infinity;
+        let cursor = sinkId;
+        while (cursor !== sourceId) {
+            const previous = predecessor.get(cursor)!;
+            bottleneck = Math.min(
+                bottleneck,
+                residualCapacity.get(previous)?.get(cursor) ?? 0,
+            );
+            cursor = previous;
+        }
+
+        cursor = sinkId;
+        while (cursor !== sourceId) {
+            const previous = predecessor.get(cursor)!;
+            const forwardRow = residualCapacity.get(previous)!;
+            forwardRow.set(cursor, (forwardRow.get(cursor) ?? 0) - bottleneck);
+
+            const backwardRow = ensureRow(cursor);
+            backwardRow.set(previous, (backwardRow.get(previous) ?? 0) + bottleneck);
+
+            const edgeId = edgeIdByPair.get(`${previous}>${cursor}`);
+            if (edgeId) usedEdgeIds.add(edgeId);
+
+            cursor = previous;
+        }
+
+        maxFlow += bottleneck;
+    }
+
+    return {
+        visitedNodeIds: [...visitedNodeIds],
+        visitedEdgeIds: [...usedEdgeIds],
+        resultNodeIds: [...visitedNodeIds],
+        resultEdgeIds: [...usedEdgeIds],
+        distances: {},
+        metrics: { maxFlow },
+        description: `Max flow from ${findNodeLabel(graph, sourceId)} to ${findNodeLabel(graph, sinkId)} = ${maxFlow}`,
+    };
+}
+
 export function runAlgorithm(
     id: AlgorithmId,
     graph: Graph,
     sourceId?: string,
+    targetId?: string,
 ): AlgorithmStep {
     switch (id) {
         case "bfs":
@@ -472,5 +874,13 @@ export function runAlgorithm(
             return runPrim(graph, sourceId!);
         case "topological-sort":
             return runTopologicalSort(graph);
+        case "a-star":
+            return runAStar(graph, sourceId!, targetId!);
+        case "floyd-warshall":
+            return runFloydWarshall(graph, sourceId!);
+        case "connected-components":
+            return runConnectedComponents(graph);
+        case "max-flow":
+            return runMaxFlow(graph, sourceId!, targetId!);
     }
 }

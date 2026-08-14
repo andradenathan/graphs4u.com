@@ -1,11 +1,26 @@
 import { useState, useRef, useEffect } from "react";
-import { Waypoints, Github, Trash2, ChevronDown, Heart, Menu } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
+import {
+    Waypoints,
+    Github,
+    Trash2,
+    ChevronDown,
+    Heart,
+    Menu,
+    BookOpen,
+} from "lucide-react";
 import { useGraph } from "@/hooks/use-graph";
 import { useI18n } from "@/hooks/use-i18n";
-import { languages, type LanguageCode } from "@/lib/i18n";
+import { languages } from "@/lib/i18n";
+import {
+    buildAlgorithmsIndexPath,
+    buildHomePath,
+    translatePath,
+} from "@/lib/routes";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { DonateDialog } from "@/components/layout/donate-dialog";
+import { ShareGraphButton } from "@/components/layout/share-graph-button";
 
 interface HeaderProps {
     onSidebarToggle?: () => void;
@@ -13,7 +28,8 @@ interface HeaderProps {
 
 export function Header({ onSidebarToggle }: HeaderProps) {
     const { state, clearGraph } = useGraph();
-    const { lang, setLang, t } = useI18n();
+    const { lang, t } = useI18n();
+    const location = useLocation();
     const nodeCount = state.graph.nodes.length;
     const edgeCount = state.graph.edges.length;
 
@@ -44,25 +60,43 @@ export function Header({ onSidebarToggle }: HeaderProps) {
             className="flex h-12 shrink-0 items-center justify-between border-b border-border bg-surface px-3 md:px-4"
         >
             <div className="flex items-center gap-2 md:gap-3 min-w-0">
-                <IconButton
-                    aria-label="Toggle sidebar"
-                    onClick={onSidebarToggle}
-                    size="sm"
-                    className="md:hidden"
-                >
-                    <Menu className="size-5" />
-                </IconButton>
+                {onSidebarToggle && (
+                    <IconButton
+                        aria-label="Toggle sidebar"
+                        onClick={onSidebarToggle}
+                        size="sm"
+                        className="md:hidden"
+                    >
+                        <Menu className="size-5" />
+                    </IconButton>
+                )}
 
-                <div className="flex items-center gap-2">
+                <Link
+                    to={buildHomePath(lang)}
+                    aria-label="graphs4u"
+                    className="flex items-center gap-2"
+                >
                     <Waypoints className="size-5 text-primary flex-shrink-0" />
                     <span className="text-sm font-semibold tracking-tight text-foreground hidden sm:inline">
                         graphs4u
                     </span>
-                </div>
+                </Link>
 
                 <div className="h-4 w-px bg-border hidden md:block" />
 
-                <div className="flex items-center gap-2 md:gap-3 text-xs text-muted-foreground hidden md:flex">
+                <Link
+                    to={buildAlgorithmsIndexPath(lang)}
+                    className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-surface-raised hover:text-foreground"
+                >
+                    <BookOpen className="size-4 shrink-0" />
+                    <span className="hidden sm:inline">
+                        {t("header.learn")}
+                    </span>
+                </Link>
+
+                <div className="h-4 w-px bg-border hidden md:block" />
+
+                <div className="hidden items-center gap-2 text-xs text-muted-foreground md:flex md:gap-3">
                     <span>
                         {nodeCount}{" "}
                         {nodeCount === 1 ? t("header.node") : t("header.nodes")}
@@ -75,6 +109,8 @@ export function Header({ onSidebarToggle }: HeaderProps) {
             </div>
 
             <div className="flex items-center gap-1">
+                {nodeCount > 0 && <ShareGraphButton />}
+
                 {(nodeCount > 0 || edgeCount > 0) && (
                     <IconButton
                         aria-label={t("header.clear")}
@@ -104,13 +140,16 @@ export function Header({ onSidebarToggle }: HeaderProps) {
                     {languageDropdownOpen && (
                         <div className="absolute right-0 top-full z-50 mt-1 min-w-32 overflow-hidden rounded-lg border border-border bg-surface-overlay shadow-xl">
                             {languages.map((language) => (
-                                <button
+                                <Link
                                     key={language.code}
-                                    type="button"
-                                    onClick={() => {
-                                        setLang(language.code as LanguageCode);
-                                        setLanguageDropdownOpen(false);
-                                    }}
+                                    to={translatePath(
+                                        location.pathname,
+                                        language.code,
+                                    )}
+                                    hrefLang={language.code}
+                                    onClick={() =>
+                                        setLanguageDropdownOpen(false)
+                                    }
                                     className={`flex w-full cursor-pointer items-center px-3 py-2 text-xs transition-colors ${
                                         lang === language.code
                                             ? "bg-primary/10 text-foreground"
@@ -118,7 +157,7 @@ export function Header({ onSidebarToggle }: HeaderProps) {
                                     }`}
                                 >
                                     {language.label}
-                                </button>
+                                </Link>
                             ))}
                         </div>
                     )}
@@ -130,21 +169,13 @@ export function Header({ onSidebarToggle }: HeaderProps) {
                     href="https://github.com/andradenathan/graphs4u.com"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs text-muted-foreground transition-colors hover:text-foreground hidden md:flex"
+                    aria-label={t("header.openSource")}
+                    className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
                 >
                     <Github className="size-4" />
                     <span className="hidden lg:inline">
                         {t("header.openSource")}
                     </span>
-                </a>
-
-                <a
-                    href="https://github.com/andradenathan/graphs4u.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex md:hidden items-center rounded-lg px-2 py-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
-                >
-                    <Github className="size-4" />
                 </a>
 
                 <div className="h-4 w-px bg-border mx-1 hidden md:block" />

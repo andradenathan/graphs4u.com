@@ -1,0 +1,53 @@
+# graphs4u
+
+> Free, open-source, browser-based graph algorithm visualizer. Users draw a graph (nodes and edges, optionally directed and/or weighted) directly on a canvas and run classic graph algorithms on it, seeing every visited node and edge highlighted, plus the numeric result. No account, no install, no data leaves the browser.
+
+- **Site:** https://graphs4u.com/
+- **Repository:** https://github.com/andradenathan/graphs4u.com
+- **License:** MIT
+- **Languages:** English (https://graphs4u.com/), Portuguese (https://graphs4u.com/pt/)
+- **Runs entirely client-side:** graphs are never uploaded to a server.
+
+## What it does
+
+Users place nodes on a board, connect them with edges, choose whether the graph is directed and whether edges carry weights, then pick an algorithm and a source node (and a target node, for A* and maximum flow). The result is shown on the board and as text, and can be exported to PDF. Any graph can be shared as a link, since the whole graph is encoded in the URL.
+
+## Algorithms available
+
+| Algorithm | Purpose | Time complexity | Needs weights | Negative weights | Page |
+|---|---|---|---|---|---|
+| BFS (breadth-first search) | Traversal, shortest path in unweighted graphs | O(V + E) | No | N/A | https://graphs4u.com/algorithms/bfs/ |
+| DFS (depth-first search) | Traversal, cycle detection | O(V + E) | No | N/A | https://graphs4u.com/algorithms/dfs/ |
+| Dijkstra | Single-source shortest path | O((V + E) log V) | Yes | No | https://graphs4u.com/algorithms/dijkstra/ |
+| Bellman-Ford | Single-source shortest path, negative cycle detection | O(V · E) | Yes | Yes | https://graphs4u.com/algorithms/bellman-ford/ |
+| A* | Shortest path between two nodes, guided by a heuristic | O((V + E) log V) worst case | Yes | No | https://graphs4u.com/algorithms/a-star/ |
+| Floyd-Warshall | All-pairs shortest paths | O(V³) | Yes | Yes | https://graphs4u.com/algorithms/floyd-warshall/ |
+| Kruskal | Minimum spanning tree | O(E log E) | Yes | Yes | https://graphs4u.com/algorithms/kruskal/ |
+| Prim | Minimum spanning tree | O(E log V) | Yes | Yes | https://graphs4u.com/algorithms/prim/ |
+| Topological sort | Linear ordering of a DAG | O(V + E) | No | N/A | https://graphs4u.com/algorithms/topological-sort/ |
+| Connected components | Groups of mutually reachable nodes | O(V + E) | No | N/A | https://graphs4u.com/algorithms/connected-components/ |
+| Maximum flow (Edmonds-Karp) | Largest flow from source to sink | O(V · E²) | Yes (capacities) | No | https://graphs4u.com/algorithms/max-flow/ |
+
+Portuguese versions live under https://graphs4u.com/pt/algoritmos/ with translated slugs (for example `ordenacao-topologica`, `componentes-conexos`, `fluxo-maximo`, `a-estrela`).
+
+## Common questions
+
+**Is graphs4u free?** Yes. It is free and open source under the MIT license, with no account and no paid tier.
+
+**Does it work offline?** Yes, it is a static client-side application and can be installed as a PWA.
+
+**Which algorithm should I use for shortest path?** Use BFS for unweighted graphs, Dijkstra for non-negative weights, A* when you only need one specific source-target pair and have a distance estimate, and Bellman-Ford when any edge weight can be negative or you need negative-cycle detection.
+
+**Kruskal or Prim for a minimum spanning tree?** Both give a minimum spanning tree of the same total weight. Kruskal sorts edges globally and suits sparse graphs; Prim grows a tree from one source node and suits dense graphs.
+
+**How do I share a graph?** The share button copies a link containing the entire graph encoded in the query string, so the recipient opens the exact same graph without any account.
+
+**Can I import my own graph?** Yes, through DOT (Graphviz), an adjacency matrix or an edge list. The same formats can be exported.
+
+## Keyboard shortcuts
+
+`V` select · `N` add node · `E` add edge · `D` delete · `Del`/`Backspace` delete selection · `Esc` clear selection · `Shift + click` multi-select · scroll to zoom.
+
+## Optional
+
+- [Contributing guide](https://github.com/andradenathan/graphs4u.com/blob/main/CONTRIBUTING.md): how to open issues and pull requests.

@@ -2,16 +2,30 @@
 <html lang="en" class="dark">
 	<head>
 		<meta charset="UTF-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<meta name="description" content="graphs4u — Open source graph algorithm visualizer" />
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-		<title>graphs4u — Graph Algorithm Visualizer</title>
+
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+		<link rel="manifest" href="/manifest.webmanifest" />
+		<meta name="theme-color" content="#18181b" />
+		<meta name="color-scheme" content="dark" />
 	</head>
 	<body>
-		<div id="root"></div>
+		<div id="root"><!--app-html--></div>
+		<noscript>
+			<div style="max-width: 42rem; margin: 4rem auto; padding: 0 1.5rem; font-family: system-ui, sans-serif; color: #e6e6ea; background: #18181b;">
+				<h1>graphs4u — graph algorithm visualizer</h1>
+				<p>
+					graphs4u lets you draw a graph in the browser and run classic graph algorithms on it:
+					breadth-first search (BFS), depth-first search (DFS), Dijkstra, Bellman-Ford, Kruskal,
+					Prim and topological sort. It is free, open source (MIT) and requires no account.
+				</p>
+				<p>
+					The editor needs JavaScript to run. Please enable JavaScript, or read the
+					<a href="https://github.com/andradenathan/graphs4u.com" style="color: #5b7ef6;">source code on GitHub</a>.
+				</p>
+			</div>
+		</noscript>
 		<script type="module" src="/src/main.tsx"></script>
 	</body>
 </html>
