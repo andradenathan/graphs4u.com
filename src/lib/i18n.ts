@@ -83,6 +83,28 @@ const translations: Record<LanguageCode, Record<string, string>> = {
         "algo.cat.shortestPath": "Shortest Path",
         "algo.cat.mst": "Minimum Spanning Tree",
         "algo.cat.ordering": "Ordering",
+        "io.title": "Import / export graph",
+        "io.import": "Import",
+        "io.export": "Export current graph",
+        "io.imported": "Graph imported",
+        "io.open": "Import / export",
+        "io.format.dot": "DOT (Graphviz)",
+        "io.format.adjacencyMatrix": "Adjacency matrix",
+        "io.format.edgeList": "Edge list",
+        "io.hint.dot":
+            "Graphviz syntax. Use digraph for directed graphs and [weight=3] for weights.",
+        "io.hint.adjacency-matrix":
+            "One row per node, values separated by spaces or commas. 0 means no edge; any other value becomes the edge weight. An optional first line can hold the labels.",
+        "io.hint.edge-list":
+            "One edge per line: source target, or source target weight. A line with a single name creates an isolated node.",
+        "io.error.empty": "Paste a graph first.",
+        "io.error.dot": "No DOT edges found. Check the -> or -- connectors.",
+        "io.error.matrixShape":
+            "The matrix must be square: the number of rows and columns has to match.",
+        "io.error.matrixValue": "The matrix must contain numbers only.",
+        "io.error.edgeList":
+            "Each line must have a source, a target and optionally a numeric weight.",
+
         "share.copyLink": "Share",
         "share.copied": "Link copied",
         "share.empty": "Add nodes to the graph to share it",
@@ -215,6 +237,29 @@ const translations: Record<LanguageCode, Record<string, string>> = {
         "algo.cat.shortestPath": "Caminho Mínimo",
         "algo.cat.mst": "Árvore Geradora Mínima",
         "algo.cat.ordering": "Ordenação",
+        "io.title": "Importar / exportar grafo",
+        "io.import": "Importar",
+        "io.export": "Exportar grafo atual",
+        "io.imported": "Grafo importado",
+        "io.open": "Importar / exportar",
+        "io.format.dot": "DOT (Graphviz)",
+        "io.format.adjacencyMatrix": "Matriz de adjacência",
+        "io.format.edgeList": "Lista de arestas",
+        "io.hint.dot":
+            "Sintaxe Graphviz. Use digraph para grafos direcionados e [weight=3] para pesos.",
+        "io.hint.adjacency-matrix":
+            "Uma linha por nó, valores separados por espaço ou vírgula. 0 significa sem aresta; qualquer outro valor vira o peso da aresta. Uma primeira linha opcional pode conter os rótulos.",
+        "io.hint.edge-list":
+            "Uma aresta por linha: origem destino, ou origem destino peso. Uma linha com um único nome cria um nó isolado.",
+        "io.error.empty": "Cole um grafo primeiro.",
+        "io.error.dot":
+            "Nenhuma aresta DOT encontrada. Verifique os conectores -> ou --.",
+        "io.error.matrixShape":
+            "A matriz precisa ser quadrada: o número de linhas e colunas tem que coincidir.",
+        "io.error.matrixValue": "A matriz deve conter apenas números.",
+        "io.error.edgeList":
+            "Cada linha precisa ter origem, destino e, opcionalmente, um peso numérico.",
+
         "share.copyLink": "Compartilhar",
         "share.copied": "Link copiado",
         "share.empty": "Adicione nós ao grafo para compartilhá-lo",
