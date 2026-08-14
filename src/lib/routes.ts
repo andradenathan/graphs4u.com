@@ -88,6 +88,21 @@ export function listSitePages(): PageDescriptor[] {
 			path: buildHomePath(language),
 			priority: 1,
 		});
+		pages.push({
+			pageKey: "algorithms-index",
+			language,
+			path: buildAlgorithmsIndexPath(language),
+			priority: 0.9,
+		});
+
+		for (const algorithmId of Object.keys(algorithmSlugs) as AlgorithmId[]) {
+			pages.push({
+				pageKey: `algorithm:${algorithmId}`,
+				language,
+				path: buildAlgorithmPath(algorithmId, language),
+				priority: 0.8,
+			});
+		}
 	}
 
 	return pages;

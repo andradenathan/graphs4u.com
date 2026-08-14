@@ -47,14 +47,16 @@ export function Header({ onSidebarToggle }: HeaderProps) {
             className="flex h-12 shrink-0 items-center justify-between border-b border-border bg-surface px-3 md:px-4"
         >
             <div className="flex items-center gap-2 md:gap-3 min-w-0">
-                <IconButton
-                    aria-label="Toggle sidebar"
-                    onClick={onSidebarToggle}
-                    size="sm"
-                    className="md:hidden"
-                >
-                    <Menu className="size-5" />
-                </IconButton>
+                {onSidebarToggle && (
+                    <IconButton
+                        aria-label="Toggle sidebar"
+                        onClick={onSidebarToggle}
+                        size="sm"
+                        className="md:hidden"
+                    >
+                        <Menu className="size-5" />
+                    </IconButton>
+                )}
 
                 <Link
                     to={buildHomePath(lang)}
