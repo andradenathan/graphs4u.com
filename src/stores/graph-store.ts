@@ -48,6 +48,7 @@ export const initialState: GraphState = {
     activeTool: "select",
     edgeSourceId: null,
     algorithmResult: null,
+    graphLoadCount: 0,
 };
 
 let nodeCounter = 0;
@@ -246,6 +247,7 @@ export function graphReducer(state: GraphState, action: Action): GraphState {
             return {
                 ...initialState,
                 activeTool: state.activeTool,
+                graphLoadCount: state.graphLoadCount,
             };
 
         case "LOAD_GRAPH":
@@ -256,6 +258,7 @@ export function graphReducer(state: GraphState, action: Action): GraphState {
                 ...initialState,
                 activeTool: state.activeTool,
                 graph: action.payload.graph,
+                graphLoadCount: state.graphLoadCount + 1,
             };
 
         case "MOVE_NODE":

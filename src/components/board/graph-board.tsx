@@ -9,17 +9,11 @@ import { useGraph } from "@/hooks/use-graph";
 import { useI18n } from "@/hooks/use-i18n";
 import { BoardToolbar } from "@/components/board/board-toolbar";
 import { AlgorithmFloatingPanel } from "@/components/board/algorithm-floating-panel";
+import { calculateFitViewBox, type ViewBox } from "@/lib/graph-viewport";
 import { twMerge } from "tailwind-merge";
 
 const NODE_RADIUS = 20;
 const ARROWHEAD_SIZE = 10;
-
-interface ViewBox {
-    x: number;
-    y: number;
-    w: number;
-    h: number;
-}
 
 export function GraphBoard() {
     const svgRef = useRef<SVGSVGElement>(null);
@@ -46,6 +40,7 @@ export function GraphBoard() {
         selectedEdgeIds,
         edgeSourceId,
         algorithmResult,
+        graphLoadCount,
     } = state;
 
     const [viewBox, setViewBox] = useState<ViewBox>({
@@ -60,6 +55,21 @@ export function GraphBoard() {
     const [mousePos, setMousePos] = useState<{ x: number; y: number } | null>(
         null,
     );
+
+    // A freshly loaded graph (example, import, shared link) comes with its own
+    // coordinates, unrelated to wherever the user left the camera. Re-frame it so
+    // it always opens in the middle of the board.
+    const lastFittedGraphLoadCountRef = useRef(0);
+    useEffect(() => {
+        if (graphLoadCount === lastFittedGraphLoadCountRef.current) return;
+        const svg = svgRef.current;
+        if (!svg) return;
+        const { width, height } = svg.getBoundingClientRect();
+        if (height === 0) return;
+        lastFittedGraphLoadCountRef.current = graphLoadCount;
+        const fitViewBox = calculateFitViewBox(graph.nodes, width / height);
+        if (fitViewBox) setViewBox(fitViewBox);
+    }, [graphLoadCount, graph.nodes]);
 
     const screenToSvg = useCallback(
         (clientX: number, clientY: number) => {
