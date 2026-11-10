@@ -38,4 +38,6 @@ export interface GraphState {
     activeTool: Tool;
     edgeSourceId: string | null;
     algorithmResult: AlgorithmResult | null;
+    /** Increments every time a whole graph is loaded, so the board knows to re-frame it. */
+    graphLoadCount: number;
 }
